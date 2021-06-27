@@ -1,0 +1,72 @@
+<head>
+    <title>BusterBros Editor v1.6</title>
+    <!-- CSS -->
+    <style>
+        body {
+            margin: 0px;
+        }
+        canvas {
+            user-select: none;
+            image-rendering: -moz-crisp-edges;
+	        image-rendering: -webkit-crisp-edges;
+	        image-rendering: pixelated;
+	        image-rendering: crisp-edges;
+        }
+        #SelCanvas {
+            margin: 10px 0 0 0;
+            user-select: none;
+            image-rendering: -moz-crisp-edges;
+	        image-rendering: -webkit-crisp-edges;
+    	    image-rendering: pixelated;
+	        image-rendering: crisp-edges;
+        }
+    </style>
+    <!-- Scripts -->
+    <script defer src="js/util.js"></script>
+    <script defer src="js/objects.js"></script>
+    <script defer src="js/saveload.js"></script>
+    <script defer src="js/main.js"></script>
+</head>
+<body>
+    <!-- Canvases -->
+    <canvas id="MainCanvas"></canvas>
+    <canvas id="SelCanvas"></canvas><br>
+    <!-- UI -->
+    <button class="DOM_LayerButtons" onclick="SelectLayer(0,this);" style="background-color: 00FF00">Back</button><button onclick="HideShow(0,this);">Hide</button><br>
+    <button class="DOM_LayerButtons" onclick="SelectLayer(1,this);">Mid</button><button onclick="HideShow(1,this);">Hide</button><br>
+    <button class="DOM_LayerButtons" onclick="SelectLayer(2,this);">Front</button><button onclick="HideShow(2,this);">Hide</button><br>
+    <button class="DOM_LayerButtons" onclick="SelectLayer(3,this);">Actions</button><button onclick="HideShow(3,this);">Hide</button><br>
+    <button onclick="ToggleGrid(this);">Hide Grid</button>
+    <button onclick="$('#DOM_imageLoader').click();" id="DOM_LoadSheet" title="Load tile sheet">Load Tilesheet</button>
+    <!-- Image loader -->
+    <input id="DOM_imageLoader" type="file" style="display: none">
+    <!-- Change Log -->
+    <div id="DOM_ChangeLog">
+        <span>
+            <h2>Changes</h2>
+            <button onclick="HideShowDOM($('#cg_15'));">1.5</button><br>
+            <span id="cg_15" style="display: none;">
+                <ul>
+                    <li>~ Made CSS for canvas change with image size</li>
+                    <li>+ "Change log" and "Planned Features" sections</li>
+                </ul>
+            </span><br>
+            <button onclick="HideShowDOM($('#cg_16'));">1.6</button><br>
+            <span id="cg_16" style="display: none;">
+                <ul>
+                    <li>+ Change log toggle buttons</li>
+                    <li>+ Import tile sheet</li>
+                    <li>~ Changed tile size to 16px</li>
+                    <li>~ renamed layer buttons</li>
+                </ul>
+            </span><br>
+        </span>
+        <button onclick="HideShowDOM($('#planned_features'));">Planned Features</button><br>
+        <span id="planned_features" style="display: none;">
+            <ul>
+                <li>JSON export</li>
+            </ul>
+        </span>
+    </div>
+    <!-- How To -->
+</body>
