@@ -1,0 +1,29 @@
+{
+  "name": "busterbros",
+  "version": "1.0.0",
+  "description": "multiplayer platformer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CaperCube/BusterBros.git"
+  },
+  "keywords": [
+    "platformer",
+    "multiplayer"
+  ],
+  "author": "CaperCube",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CaperCube/BusterBros/issues"
+  },
+  "homepage": "https://github.com/CaperCube/BusterBros#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "socket.io": "^4.1.2"
+  }
+}

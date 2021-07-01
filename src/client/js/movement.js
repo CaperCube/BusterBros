@@ -106,23 +106,6 @@ function ControlLoopPlatformer(p) {
     //ControllCam();
 }
 
-function ControlLoopTopDown(p) {
-    // Update velocity
-    if (GetInput(Controls.Player1.leftAxis1)) p.velocity.x -= p.moveSpeed;
-    if (GetInput(Controls.Player1.rightAxis1)) p.velocity.x += p.moveSpeed;
-    if (GetInput(Controls.Player1.upAxis1)) p.velocity.y -= p.moveSpeed;
-    if (GetInput(Controls.Player1.downAxis1)) p.velocity.y += p.moveSpeed;
-    
-    // Update position
-    UpdatePositionXY(p);
-    
-    // Apply friction
-    p.velocity.x *= friction;
-    p.velocity.y *= friction;
-    
-    //ControllCam();
-}
-
 ////////////////////////////////////////////////////////
 // Collisions
 ////////////////////////////////////////////////////////
