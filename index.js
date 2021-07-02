@@ -49,6 +49,8 @@ io.sockets.on('connection', function(socket) {
 // Game Init
 ////////////////////////////////////////
 
+let me = "go";
+
 let newPlayer = new nGame.NetPlayer("Stinky");
 let newGame = new nGame.NetGame(newPlayer);
 
