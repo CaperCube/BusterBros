@@ -8,15 +8,28 @@ const nGame = require("./src/server/NetGame");
 ////////////////////////////////////////
 require('dotenv/config');
 const express = require('express');
-const port = process.env.PORT || 27015;
-const app = express();
+const port = process.env.PORT || 8080;
 // Server communication
+const app = express();
 const serv = require('http').Server(app);
 const io = require('socket.io')(serv,{});
 
+////////////////////////////////////////
+// Server setup
+////////////////////////////////////////
 // the __dirname is the current directory from where the script is running
-app.use(express.static(__dirname + '/client'));
-app.listen(port);
+app.use(express.static(__dirname + '/src/client'));
+
+// listen for requests
+serv.listen(port);
+
+////////////////////////////////////////
+// Game Init
+////////////////////////////////////////
+
+//let newPlayer = new nGame.NetPlayer("Stinky");
+let serverGame = new nGame.NetGame();
+//newGame.netEntities[0] = newPlayer;
 
 ////////////////////////////////////////
 // Socket Connection
@@ -26,40 +39,61 @@ let SOCKET_LIST = {};
 io.sockets.on('connection', function(socket) {
     // When a user connects to the server
     // Give the connection a unique ID and store it
-    socket.id = Math.random();
-    SOCKET_LIST[socket.id] = socket;
+    socket.ID = Math.random();
+    socket.player = new nGame.NetPlayer(socket.ID);
+    SOCKET_LIST[socket.ID] = socket;
 
-    // Init user's player (change this bit so the user must make / join a game first)
-    socket.player = new nGame.NetPlayer("Player");
-    socket.player.socketID = socket.id;
+    console.log(`Welcome ${socket.ID}!`);
 
     ///////////////////////////////////////
     // Generate and init server-side message listeners from NetGame object
     ///////////////////////////////////////
+    socket.on('startGame', function(){
+        // Start the game!
+        serverGame.StartGame(SOCKET_LIST);
+    });
+
+    socket.on('clientMove', function(data){
+        // Get player with this socket.ID (if they exist)
+        if (serverGame != null) {
+
+            let myPlayer = serverGame[socket.ID];
+            if (myPlayer != null) {
+
+                // Move net player
+                myPlayer.position = data.position;
+            }
+        }
+    });
+
+    socket.on('clientStompPlayer', function(data){
+        // Get player with this socket.ID (if they exist)
+        if (serverGame != null) {
+
+            let myPlayer = serverGame.netPlayers[socket.ID];
+            if (myPlayer != null) {
+                
+                // Check if data.otherPlayer exists
+                let targetPlayer = serverGame.netPlayers[data.otherPlayerID];
+                if (targetPlayer != null){
+
+                    // Try to stomp the other player
+                    serverGame.TryStomp(myPlayer, targetPlayer);
+                }
+
+            }
+        }
+    });
 
 
     // Create listener for this user disconnecting
     socket.on('disconnect', function(){
         // Remove player (if applicable)
+        //SOCKET_LIST.splice(socket.ID, 1);
+        delete SOCKET_LIST[socket.ID];
 
+        //console.log(SOCKET_LIST);
     });
 });
 
-////////////////////////////////////////
-// Game Init
-////////////////////////////////////////
-
-let me = "go";
-
-let newPlayer = new nGame.NetPlayer("Stinky");
-let newGame = new nGame.NetGame(newPlayer);
-
-newGame.netEntities[1] = newPlayer.name;
-
-////////////////////////////////////////
-// Update Tick
-////////////////////////////////////////
-newGame.serverTickRef = setInterval(newGame.serverTick(SOCKET_LIST), newGame.serverTickTime);
-
-console.log(newGame.netEntities);
-console.log(newGame.gameId);
+console.log("Server has started");
