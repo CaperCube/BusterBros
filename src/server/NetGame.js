@@ -28,7 +28,8 @@ function NetGame() {
 
     // Server packet data to be sent
     this.serverPacket = {
-        serverMessageFlag: false
+        serverMessageFlag: false,
+        serverMessage: "",
     };
 
     /////////////////////////////////////
@@ -36,7 +37,7 @@ function NetGame() {
     /////////////////////////////////////
     this.StartGame = function(sList) {
         // Init the serverTick
-        console.log(`A new Net game has been started!\nID: ${this.gameID}`);
+        console.log(`A new Net game has been started!\nGame ID: ${this.gameID}`);
 
         var intervalGameRef = this;
 
@@ -78,7 +79,7 @@ function NetGame() {
         // Assemble server packet
         ////////////////////////////
 
-        this.serverPacket.entities = this.netEntities;
+        this.serverPacket.players = this.netPlayers;
         this.serverPacket.entities = this.netEntities;
 
         ////////////////////////////
@@ -89,8 +90,8 @@ function NetGame() {
             // Send packets
             // movement changes of authors should be ignored on client-side
 
-            //socketList[i].emit('ServerPacket', this.serverPacket);
-            console.log(`Data has been sent to a user\nUser: ${sID}`);
+            socketList[sID].emit('ServerPacket', this.serverPacket);
+            //console.log(`Data has been sent to a user\nUser: ${sID}`);
         }
 
         ////////////////////////////
@@ -100,7 +101,7 @@ function NetGame() {
         this.serverPacket.serverMessageFlag = false;
         this.serverPacket.serverMessage = "";
 
-        console.log(`Tick`);
+        //console.log(`Tick`);
     }
 }
 
@@ -120,11 +121,22 @@ module.exports.NetPlayer = NetPlayer;
 function NetPlayer(ID) {
     NetEntity.call(this);
 
+    //
+    // Identifying data
+    //
     this.socketID = ID || 0;
     this.name = "Player " + this.socketID;
     this.type = "Player";
     
+    //
+    // Player state data
+    //
     this.spawned = false;
+
+    //
+    // Player data
+    //
+    this.score = 0;
 
     this.update = function() {
         //
