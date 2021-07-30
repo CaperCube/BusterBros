@@ -84,7 +84,7 @@ io.sockets.on('connection', function(socket) {
             }
         }
     });
-
+    
 
     // Create listener for this user disconnecting
     socket.on('disconnect', function(){

@@ -129,6 +129,19 @@ function DrawWall(cctx, o) {
     );
 }
 
+//https://www.creativebloq.com/html5/build-tile-based-html5-game-31410992
+/*
+function DrawTile(cctx, tMap, tSize, idx, x, y) {
+    cctx.drawImage(
+        tMap,
+        x,
+        y,
+        tSize,
+        tSize
+    );
+}
+*/
+
 function DrawPlayer(cctx, p) {
     // Draw player
     cctx.fillStyle = p.color;
