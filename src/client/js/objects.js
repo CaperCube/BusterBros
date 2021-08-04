@@ -1,9 +1,9 @@
-var gridCellSize = 20;
+var gridCellSize = 16;
 
 ////////////////////////////////////////////////////////
 // Objects
 ////////////////////////////////////////////////////////
-function Wall(iw, ih, ix, iy, color) {
+function Wall(iw, ih, ix, iy, ti){//color) {
     this.size = {
         w: iw || gridCellSize,
         h: ih || gridCellSize
@@ -14,7 +14,18 @@ function Wall(iw, ih, ix, iy, color) {
         y: iy || 0
     };
     
-    this.color = color || "#223355";
+    //this.color = color || "#223355";
+
+    this.tIndex = ti || 0;
+}
+
+function TileWall(ix, iy, ti){
+    this.position = {
+        x: ix || 0,
+        y: iy || 0
+    };
+    
+    this.tileIndex = ti || 0;
 }
 
 function Spawn(ix, iy, color, pId) {
@@ -131,16 +142,32 @@ function DrawWall(cctx, o) {
 
 //https://www.creativebloq.com/html5/build-tile-based-html5-game-31410992
 /*
-function DrawTile(cctx, tMap, tSize, idx, x, y) {
-    cctx.drawImage(
-        tMap,
-        x,
-        y,
-        tSize,
-        tSize
-    );
+function(sprite, singleTileSpec, x, y) {
+    sprite,
+    singleTileSpec.x, singleTileSpec.y, this.tileSize, this.tileSize, // source coords
+    Math.floor(x * this.tileSize), Math.floor(y * this.tileSize), this.tileSize, this.tileSize // destination coords
+  );
 }
 */
+
+function GetPosByIndex(area, tSize, indx) {
+    let wc = area.width;
+    let hc = area.height;
+
+    return {
+        x: (indx * tSize) % wc,
+        y: Math.floor((indx * tSize) / hc) * tSize
+    };
+}
+
+function DrawTile(cctx, tMap, tSize, idx, x, y) {
+    const sampleTile = GetPosByIndex(tMap, tSize, idx);
+    cctx.drawImage(
+        tMap,
+        sampleTile.x, sampleTile.y, tSize, tSize,
+        x, y, tSize, tSize
+    );
+}
 
 function DrawPlayer(cctx, p) {
     // Draw player

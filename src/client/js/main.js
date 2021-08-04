@@ -92,7 +92,17 @@ function LoadLevel(l) {
 }
 function Init() {
     // Setup room
-    LoadLevel(Level2);
+    //LoadLevel(Level2);
+    Walls = [];
+    for (var i = 0; i < tileMapLevel.length; i++) {
+        for (var j = 0; j < tileMapLevel[i].length; j++) {
+            Walls.push(new TileWall(
+                gridCellSize * j,
+                gridCellSize * i,
+                tileMapLevel[i][j]
+            ));
+        }
+    }
     
     // Setup Players
     for (var i = 0; i < Spawns.length; i++) {
@@ -108,6 +118,7 @@ function Init() {
     
     // Start rendering
     //RenderCanvas();
+    console.log(Walls[0]);
     PlayPause();
 }
 
@@ -122,12 +133,16 @@ function RenderCanvas() {
     
     // Draw Walls
     for (var i = 0; i < Walls.length; i++) {
-        DrawWall(ctx, Walls[i]);
+        //DrawWall(ctx, Walls[i]);
+        //DrawTile(cctx, tMap, tSize, idx, x, y)
+        DrawTile(ctx, tileSheet, gridCellSize, Walls[i].tileIndex, Walls[i].position.x, Walls[i].position.y);
     }
     // Draw Spawns
+    /*
     for (var i = 0; i < Spawns.length; i++) {
         DrawWall(ctx, Spawns[i]);
     }
+    */
     /*
     // Draw DeathZones
     for (var i = 0; i < DeathZones.length; i++) {
