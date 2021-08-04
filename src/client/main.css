@@ -5,7 +5,7 @@ body {
 
 #my_canvas {
 	width: 800px;
-	height: 800px;
+	height: 640px;
 	image-rendering: -moz-crisp-edges;
 	image-rendering: -webkit-crisp-edges;
 	image-rendering: pixelated;

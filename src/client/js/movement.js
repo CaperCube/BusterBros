@@ -122,19 +122,24 @@ function Collision(r1, r2) {
 
 function PlaceFree(p, xNew, yNew) {
     var temp = {
-        x: xNew,
-        y: yNew,
-        w: p.size.w,
-        h: p.size.h
+        x: xNew + 2,
+        y: yNew + 4,
+        w: p.size.w - 4,
+        h: p.size.h - 4
     };
     for (var i = 0; i < Walls.length; i++) {
-        var wallTemp = {
-            x: Walls[i].position.x,
-            y: Walls[i].position.y,
-            w: Walls[i].size.w,
-            h: Walls[i].size.h
-        };
-        if (Collision(temp, wallTemp)) {
+        var wallTemp = null;
+        if (Walls[i] != null) {
+            wallTemp = {
+                x: Walls[i].position.x,
+                y: Walls[i].position.y,
+                //w: Walls[i].size.w,
+                //h: Walls[i].size.h
+                w: gridCellSize,
+                h: gridCellSize
+            };
+        }
+        if (wallTemp !== null && Collision(temp, wallTemp)) {
             //console.log("COLLIDE!");
             return false;
         }

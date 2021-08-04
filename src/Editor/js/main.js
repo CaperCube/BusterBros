@@ -9,7 +9,7 @@
 //////////////////////////////////////////
 const container = $('#MainCanvas');
 const ctx = container.getContext("2d");
-var cw = container.width = $("#MainCanvas").style.width = 320;
+var cw = container.width = $("#MainCanvas").style.width = 400;
 var ch = container.height = $("#MainCanvas").style.height = 256;
 
 //////////////////////////////////////////
@@ -47,6 +47,7 @@ var layers = [
     new Array(),
     new Array()
 ];
+let levelArray = [];
 
 var selLayer = 0;
 var hiddenLayers = [false, false, false, false];
@@ -88,6 +89,7 @@ container.addEventListener('mousedown', function(e){
             container.style.cursor = "not-allowed";
             // Erase tile
             layers[selLayer].splice(check.index, 1);
+            levelArray[tY/tileSize][tX/tileSize] = null;
         }
         // The tile is NOT the same
         else {
@@ -96,6 +98,7 @@ container.addEventListener('mousedown', function(e){
             // Replace tile
             layers[selLayer][check.index].tsIndex.sX = tileSelX;
             layers[selLayer][check.index].tsIndex.sY = tileSelY;
+            levelArray[tY/tileSize][tX/tileSize] = createTileHere(tX, tY, tileSelX, tileSelY).id;
         }
     }
     
@@ -105,6 +108,8 @@ container.addEventListener('mousedown', function(e){
         container.style.cursor = "crosshair";
         // Create tile
         if (!check.bool) layers[selLayer].push(createTileHere(tX, tY, tileSelX, tileSelY));
+        //if (!check.bool) layers[selLayer][tX/tileSize][tY/tileSize] = createTileHere(tX, tY, tileSelX, tileSelY).id;
+        if (!check.bool) levelArray[tY/tileSize][tX/tileSize] = createTileHere(tX, tY, tileSelX, tileSelY).id;
     }
 });
 
@@ -126,12 +131,14 @@ container.addEventListener('mousemove', function(e){
         if (drawMode == 2) {
             // Erase tile
             layers[selLayer].splice(check.index, 1);
+            levelArray[tY/tileSize][tX/tileSize] = null;
         }
         // Paint Mode
         else if (drawMode == 1){
             // Replace tile
             layers[selLayer][check.index].tsIndex.sX = tileSelX;
             layers[selLayer][check.index].tsIndex.sY = tileSelY;
+            levelArray[tY/tileSize][tX/tileSize] = createTileHere(tX, tY, tileSelX, tileSelY).id;
         }
     }
     
@@ -140,6 +147,8 @@ container.addEventListener('mousemove', function(e){
         // Create tile
         //if (!check.bool) layers[selLayer].push(createTileHere(tX, tY, tileSelX, tileSelY));
         if (!check.bool) layers[selLayer].push(createTileHere(tX, tY, tileSelX, tileSelY));
+        //if (!check.bool) layers[selLayer][tX/tileSize][tY/tileSize] = createTileHere(tX, tY, tileSelX, tileSelY).id;
+        if (!check.bool) levelArray[tY/tileSize][tX/tileSize] = createTileHere(tX, tY, tileSelX, tileSelY).id;
     }
     
     txLast = tX;
@@ -185,6 +194,12 @@ function checkTileSpace(tlx,tly) {
 function createTileHere(x,y,tsx,tsy) {
     var tTile = new Tile();
     
+    const tw = tileSetImage.width/tileSize;
+    const th = tileSetImage.height/tileSize;
+    //tileSize
+    let ix = tsx/tileSize;
+    let iy = tsy/tileSize;
+    tTile.id = ix + ( iy * tw );
     tTile.tsIndex.sX = tsx;
     tTile.tsIndex.sY = tsy;
     tTile.position.X = x;
@@ -232,7 +247,7 @@ function HideShowDOM(o) {
 function drawGrid() {
     ctx.strokeStyle = gridColor;
     ctx2.strokeStyle = gridColor;
-    for (var i = 0; i <= tileNumWidth; i++) {
+    for (var i = 0; i <= sw/tileSize; i++) {
         // Vert
         ctx.beginPath();
         ctx.moveTo(tileSize * i, 0);
@@ -241,7 +256,7 @@ function drawGrid() {
         
         ctx2.beginPath();
         ctx2.moveTo(tileSize * i, 0);
-        ctx2.lineTo(tileSize * i, ch);
+        ctx2.lineTo(tileSize * i, sh);
         ctx2.stroke();
         // Horz
         ctx.beginPath();
@@ -251,8 +266,29 @@ function drawGrid() {
         
         ctx2.beginPath();
         ctx2.moveTo(0, tileSize * i);
-        ctx2.lineTo(cw, tileSize * i);
+        ctx2.lineTo(sw, tileSize * i);
         ctx2.stroke();
+    }
+}
+
+function drawRefNumbers() {
+    let indexCounter = 0;
+    for (var i = 0; i <= (sh/tileSize)-1; i++) {
+        for (var j = 0; j <= (sw/tileSize)-1; j++) {
+            let px = (j*tileSize)+tileSize/2;
+            let py = (i*tileSize)+tileSize/2;
+
+            ctx2.strokeStyle = "black";
+            ctx2.fillStyle = "black";
+            ctx2.fillRect(px-7, py, (tileSize/2)+7, tileSize/2);
+
+            ctx2.strokeStyle = "white";
+            ctx2.fillStyle = "white";
+            ctx2.font = '6px sans-serif';
+            ctx2.fillText( j + ( i * (sw/tileSize) ), px-6, py+6);
+
+            indexCounter++;
+        }
     }
 }
 
@@ -286,11 +322,14 @@ function render() {
         }
     }
     
-    // Draw Grid
-    if (showGrid) drawGrid();
-    
     // Draw Ref
     drawRef();
+
+    // Draw Grid
+    if (showGrid) {
+        drawGrid();
+        drawRefNumbers();
+    }
     
     // Request next render loop
     requestAnimationFrame(render);
@@ -301,6 +340,14 @@ function render() {
 //////////////////////////////////////////
 
 function init() {
+    // Set up level array
+    for (var i = 0; i < ch/tileSize; i++) {
+        levelArray[i] = [];
+        for (var j = 0; j < cw/tileSize; j++) {
+            levelArray[i][j] = null;
+        }
+    }
+
     tileSetImage.src = "img/smw_ts1.png";
     sw = containerSel.width = $("#SelCanvas").style.width = tileSetImage.width;
     sh = containerSel.height = $("#SelCanvas").style.height = tileSetImage.height;

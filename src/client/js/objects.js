@@ -67,7 +67,7 @@ function Player(ix, iy, color, pid) {
     this.moveSpeed = 0.5;
     this.dir = 1;
     
-    this.jumpSpeed = 3;
+    this.jumpSpeed = 3.2;
     this.totalJumps = 2;
     this.usedJumps = 0;
     

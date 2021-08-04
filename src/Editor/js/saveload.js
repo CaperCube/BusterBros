@@ -37,3 +37,14 @@ function refreshPalette(newImg) {
     sw = containerSel.width = $("#SelCanvas").style.width = tileSetImage.width;
     sh = containerSel.height = $("#SelCanvas").style.height = tileSetImage.height;
 }
+
+function SaveLevel() {
+    /*
+    let levelAr = [[]];
+    for (var i = 0; i < layers[0].length; i++) {
+        for (var j = 0; j < layers[0][i].length; j++) {
+        levelAr[i][j] = layers[0][i][j];
+    }
+    */
+    console.log(levelArray);
+}

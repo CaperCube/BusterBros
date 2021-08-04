@@ -4,11 +4,15 @@
 ////////////////////////////////////////////////////////
 // Canvas and draw variables
 ////////////////////////////////////////////////////////
-var canvas = $("#my_canvas");
-var ctx = canvas.getContext("2d");
+const canvas = $("#my_canvas");
+const ctx = canvas.getContext("2d");
 var cWidth = canvas.width = 400;
-var cHeight = canvas.height = 400;
-var bgColor = "#ffffff";
+var cHeight = canvas.height = 320;
+const bgColor = "#ffffff";
+const checkerColor1 = "#252627";
+const checkerColor2 = "#202122";
+
+const LevelOffset = {x: 0 * gridCellSize, y: 0 * gridCellSize};
 
 function setCanvasSize(w,h) {
     cWidth = canvas.width = w;
@@ -96,11 +100,14 @@ function Init() {
     Walls = [];
     for (var i = 0; i < tileMapLevel.length; i++) {
         for (var j = 0; j < tileMapLevel[i].length; j++) {
-            Walls.push(new TileWall(
-                gridCellSize * j,
-                gridCellSize * i,
-                tileMapLevel[i][j]
-            ));
+            if (tileMapLevel[i][j] != null) {
+                Walls.push(new TileWall(
+                    gridCellSize * j,
+                    gridCellSize * i,
+                    tileMapLevel[i][j]
+                ));
+            }
+            else Walls.push(null);
         }
     }
     
@@ -122,20 +129,46 @@ function Init() {
     PlayPause();
 }
 
+Buttons.r.onPress = TempSpawnPlayer;
+
+function TempSpawnPlayer() {
+    // Temporary player spawn override
+    Players[0] = new Player(
+        4 * gridCellSize,
+        3 * gridCellSize,
+        playerColors[0],
+        0
+    );
+}
+
+function DrawBGCheckers() {
+    let gCount = 0;
+    for (var i = 0; i < cHeight/gridCellSize; i++) {
+        for (var j = 0; j < cWidth/gridCellSize; j++) {
+            if (gCount % 2 == 0) ctx.fillStyle = checkerColor1;
+            else ctx.fillStyle = checkerColor2;
+            ctx.fillRect(j*gridCellSize, i*gridCellSize, gridCellSize, gridCellSize);
+            gCount++
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////
 // Render
 ////////////////////////////////////////////////////////
 function RenderCanvas() {
     // Clear canvas
     //ctx.clearRect(0,0,cWidth,cHeight);
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "grey";//"#000000";
     ctx.fillRect(0,0,cWidth,cHeight);
+
+    DrawBGCheckers();
     
     // Draw Walls
     for (var i = 0; i < Walls.length; i++) {
         //DrawWall(ctx, Walls[i]);
         //DrawTile(cctx, tMap, tSize, idx, x, y)
-        DrawTile(ctx, tileSheet, gridCellSize, Walls[i].tileIndex, Walls[i].position.x, Walls[i].position.y);
+        if (Walls[i] != null && Walls[i] != undefined) DrawTile(ctx, tileSheet, gridCellSize, Walls[i].tileIndex, Walls[i].position.x + LevelOffset.x, Walls[i].position.y + LevelOffset.y);
     }
     // Draw Spawns
     /*
