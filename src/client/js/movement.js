@@ -37,16 +37,53 @@ function UpdatePickups(p) {
     }
 }
 
+function WorldWrapX(p) {
+    if ((p.position.x + (p.size.w/2) + p.velocity.x) < 0) {
+        if (PlaceFree(p, (gridCellSize/2), p.position.y)) {
+            //wrap to Right
+            p.position = {x: worldBounds.x - (p.size.h/2), y: p.position.y};
+        }
+        else {
+            // Bounce
+            p.velocity.x *= -bounce;
+        }
+    }
+    else if ((p.position.x + (p.size.w/2) + p.velocity.x) >= worldBounds.x) {
+        if (PlaceFree(p, (gridCellSize/2), p.position.y)) {
+            //wrap to Left
+            p.position = {x: (p.size.h/-2), y: p.position.y};
+        }
+        else {
+            // Bounce
+            p.velocity.x *= -bounce;
+        }
+    }
+}
+
 function DoGravity(p) {
     // Check y
     if (PlaceFree(p, p.position.x, p.position.y + p.velocity.y)) {
         p.position.y += p.velocity.y;
     }
     else {
+        // Bounce
         if (p.velocity.y > 0) p.usedJumps = 0;
         p.velocity.y *= -bounce;
     }
-    p.velocity.y += gravity;
+    // world bounds
+    if ((p.position.y + (p.size.h/2) + p.velocity.y) >= worldBounds.y) {
+        if (PlaceFree(p, p.position.x, (gridCellSize/2))) {
+            //wrap to top
+            p.position = {x: p.position.x, y: (p.size.h/-2)};
+        }
+        else {
+            // Bounce
+            if (p.velocity.y > 0) p.usedJumps = 0;
+            p.velocity.y *= -bounce;
+        }
+    }
+    // Do accelleration
+    else p.velocity.y += gravity;
 }
 
 function ControlCam() {
@@ -98,6 +135,7 @@ function ControlLoopPlatformer(p) {
     // Update position
     UpdatePositionX(p);
     DoGravity(p);
+    WorldWrapX(p);
     UpdatePickups(p);
     
     // Apply friction

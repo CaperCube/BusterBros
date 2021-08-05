@@ -12,25 +12,38 @@ const bgColor = "#ffffff";
 const checkerColor1 = "#252627";
 const checkerColor2 = "#202122";
 
-const LevelOffset = {x: 0 * gridCellSize, y: 0 * gridCellSize};
-
 function setCanvasSize(w,h) {
     cWidth = canvas.width = w;
     cHeight = canvas.height = h;
 }
 
-var renderInterval;
-var fps = 90;
-var isPaused = true;
+let renderInterval;
+let fps = 90;
+let isPaused = true;
 
 ////////////////////////////////////////////////////////
 // Game vars
 ////////////////////////////////////////////////////////
-var gravity = 0.1;
-var friction = 0.8;
-var bounce = 0.2;
+let gravity = 0.1;
+let friction = 0.8;
+let bounce = 0.2;
 
-var drawHp = true;
+let drawHp = true;
+let editorMode = false; // Not implemented yet
+let cameraMove = true;
+let debugMode = false; // Not implemented yet
+
+let worldBounds = {
+    x: 25 * gridCellSize,
+    y: 16 * gridCellSize
+}
+
+// Game camera
+let camera = {
+    zoom: 1, // Does nothing right now
+    position: {x: 0, y: 2 * gridCellSize},
+    speed: 2
+}
 
 ////////////////////////////////////////////////////////
 // Functions
@@ -65,6 +78,13 @@ function UpdateBullet(b, i) {
             return;
         }
     }
+}
+
+function CameraControl(c) {
+    if (Buttons.i.pressed) c.position.y -= c.speed;
+    if (Buttons.k.pressed) c.position.y += c.speed;
+    if (Buttons.j.pressed) c.position.x -= c.speed;
+    if (Buttons.l.pressed) c.position.x += c.speed;
 }
 
 ////////////////////////////////////////////////////////
@@ -162,13 +182,17 @@ function RenderCanvas() {
     ctx.fillStyle = "grey";//"#000000";
     ctx.fillRect(0,0,cWidth,cHeight);
 
+    // Draw tiled BG
     DrawBGCheckers();
     
+    // Move camera
+    if (cameraMove) CameraControl(camera);
+
     // Draw Walls
     for (var i = 0; i < Walls.length; i++) {
         //DrawWall(ctx, Walls[i]);
         //DrawTile(cctx, tMap, tSize, idx, x, y)
-        if (Walls[i] != null && Walls[i] != undefined) DrawTile(ctx, tileSheet, gridCellSize, Walls[i].tileIndex, Walls[i].position.x + LevelOffset.x, Walls[i].position.y + LevelOffset.y);
+        if (Walls[i] != null && Walls[i] != undefined) DrawTile(ctx, tileSheet, gridCellSize, Walls[i].tileIndex, Walls[i].position.x, Walls[i].position.y);
     }
     // Draw Spawns
     /*
@@ -184,12 +208,12 @@ function RenderCanvas() {
     */
     // Draw Bullets
     for (var i = 0; i < Bullets.length; i++) {
-        UpdateBullet(Bullets[i], i);
+        if (!isPaused) UpdateBullet(Bullets[i], i);
         if (Bullets[i] != null) DrawBullet(ctx, Bullets[i]);
     }
     // Draw Players
     for (var i = 0; i < Players.length; i++) {
-        UpdatePlayer(Players[i]);
+        if (!isPaused) UpdatePlayer(Players[i]);
         DrawPlayer(ctx, Players[i]);
     }
     // Draw NetPlayers
