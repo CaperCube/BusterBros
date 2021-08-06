@@ -4,7 +4,29 @@
 function UpdatePositionX(p) {
     // Check x
     if (PlaceFree(p, p.position.x + p.velocity.x, p.position.y)) {
-        p.position.x += p.velocity.x;
+        // Wrap
+        if ((p.position.x + (p.size.w/2) + p.velocity.x) < 0) {
+            if (PlaceFree(p, worldBounds.x - (gridCellSize/2), p.position.y)) {
+                //wrap to Right
+                p.position = {x: worldBounds.x - (p.size.h/2), y: p.position.y};
+            }
+            else {
+                // Bounce
+                p.velocity.x *= -bounce;
+            }
+        }
+        else if ((p.position.x + (p.size.w/2) + p.velocity.x) >= worldBounds.x) {
+            if (PlaceFree(p, 0, p.position.y)) {
+                //wrap to Left
+                p.position = {x: (p.size.h/-2), y: p.position.y};
+            }
+            else {
+                // Bounce
+                p.velocity.x *= -bounce;
+            }
+        }
+        // Do movement
+        else p.position.x += p.velocity.x;
     }
     else {
         p.velocity.x *= -bounce;
@@ -37,29 +59,6 @@ function UpdatePickups(p) {
     }
 }
 
-function WorldWrapX(p) {
-    if ((p.position.x + (p.size.w/2) + p.velocity.x) < 0) {
-        if (PlaceFree(p, (gridCellSize/2), p.position.y)) {
-            //wrap to Right
-            p.position = {x: worldBounds.x - (p.size.h/2), y: p.position.y};
-        }
-        else {
-            // Bounce
-            p.velocity.x *= -bounce;
-        }
-    }
-    else if ((p.position.x + (p.size.w/2) + p.velocity.x) >= worldBounds.x) {
-        if (PlaceFree(p, (gridCellSize/2), p.position.y)) {
-            //wrap to Left
-            p.position = {x: (p.size.h/-2), y: p.position.y};
-        }
-        else {
-            // Bounce
-            p.velocity.x *= -bounce;
-        }
-    }
-}
-
 function DoGravity(p) {
     // Check y
     if (PlaceFree(p, p.position.x, p.position.y + p.velocity.y)) {
@@ -71,10 +70,21 @@ function DoGravity(p) {
         p.velocity.y *= -bounce;
     }
     // world bounds
-    if ((p.position.y + (p.size.h/2) + p.velocity.y) >= worldBounds.y) {
+    if ((p.position.y + (p.size.h/2) + p.velocity.y) < 0) {
+        if (PlaceFree(p, p.position.x,  worldBounds.y - (gridCellSize/2))) {
+            //wrap to bottom
+            p.position = {x: p.position.x, y: worldBounds.y - (p.size.h/2) - 2};
+        }
+        else {
+            // Bounce
+            if (p.velocity.y > 0) p.usedJumps = 0;
+            p.velocity.y *= -bounce;
+        }
+    }
+    else if ((p.position.y + (p.size.h/2) + p.velocity.y) >= worldBounds.y) {
         if (PlaceFree(p, p.position.x, (gridCellSize/2))) {
             //wrap to top
-            p.position = {x: p.position.x, y: (p.size.h/-2)};
+            p.position = {x: p.position.x, y: (p.size.h/-2) + 2};
         }
         else {
             // Bounce
@@ -135,7 +145,7 @@ function ControlLoopPlatformer(p) {
     // Update position
     UpdatePositionX(p);
     DoGravity(p);
-    WorldWrapX(p);
+    //WorldWrapX(p);
     UpdatePickups(p);
     
     // Apply friction

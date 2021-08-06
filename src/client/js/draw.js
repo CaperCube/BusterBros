@@ -138,3 +138,63 @@ function DrawBullet(cctx, b) {
     );
     cctx.fill();
 }
+
+//
+// UI
+//
+let inGameUI = {top: new Image(), bottom: new Image()};
+function InitUI() {
+    // draw ui tiles for the first time and store the resulting image in inGameUI;
+}
+
+function DrawUI(cctx, worldB) {
+    //let uiHeight = (cctx.canvas.height - worldB.y);
+    let bottomUiY = worldB.y;// + uiHeight;
+    let rightMostTileX = cctx.canvas.width - gridCellSize;
+
+    cctx.fillStyle = "black";
+    // Top
+    //cctx.fillRect(0, 0, worldB.x, uiHeight);
+    // Bottom
+    //cctx.fillRect(0, bottomUiY, worldB.x, uiHeight);
+
+    // Bottom
+
+    // Top Left
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.tl);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY, gridCellSize, gridCellSize);
+    // Top Right
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.tr);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY, gridCellSize, gridCellSize);
+    // Mid Left
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.ml);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + gridCellSize, gridCellSize, gridCellSize);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
+    // Mid Right
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.mr);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + gridCellSize, gridCellSize, gridCellSize);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
+    // Bottom Left
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.bl);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
+    // Bottom Right
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.br);
+    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
+
+    // Horizontal
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.t);
+    for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
+        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY, gridCellSize, gridCellSize);
+    }
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.m);
+    for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
+        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + gridCellSize, gridCellSize, gridCellSize);
+    }
+    for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
+        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
+    }
+    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.b);
+    for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
+        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
+    }
+}

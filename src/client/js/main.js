@@ -41,7 +41,8 @@ let worldBounds = {
 // Game camera
 let camera = {
     zoom: 1, // Does nothing right now
-    position: {x: 0, y: 2 * gridCellSize},
+    //position: {x: 0, y: 2 * gridCellSize},
+    position: {x: 0, y: 0},
     speed: 2
 }
 
@@ -130,7 +131,7 @@ function Init() {
             else Walls.push(null);
         }
     }
-    
+
     // Setup Players
     for (var i = 0; i < Spawns.length; i++) {
         if (Spawns[i].player == 0) {
@@ -221,6 +222,9 @@ function RenderCanvas() {
         DrawPlayer(ctx, NetPlayers[i]);
     }
     
+    // UI layer
+    DrawUI(ctx, worldBounds);
+
     // Render again again (change this to a setInterval())
 }
 
