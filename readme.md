@@ -1,6 +1,4 @@
 # BusterBros
-* Code by CaperCube
-* v0.1
 -----------------------------------------------------------
 ## Description:
 
