@@ -69,8 +69,12 @@ function DrawPlayer(cctx, p) {
         cctx.scale(-1,1);
     }
 
+    // Choose frame
+    let framePos = 0;
+    if (Math.sin(frameCount) > 0) framePos = defaultPlayer.height;
+
     // Draw the chosen frame
-    cctx.drawImage(defaultPlayer, 0, 0, defaultPlayer.height, defaultPlayer.height,
+    cctx.drawImage(defaultPlayer, framePos, 0, defaultPlayer.height, defaultPlayer.height,
         Math.round(p.position.x + camera.position.x),
         Math.floor(p.position.y + camera.position.y),
         gridCellSize,

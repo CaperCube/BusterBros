@@ -20,6 +20,7 @@ function setCanvasSize(w,h) {
 let renderInterval;
 let fps = 90;
 let isPaused = true;
+let frameCount = 0;
 
 ////////////////////////////////////////////////////////
 // Game vars
@@ -178,6 +179,9 @@ function DrawBGCheckers() {
 // Render
 ////////////////////////////////////////////////////////
 function RenderCanvas() {
+    // Frame count
+    frameCount++;
+
     // Clear canvas
     //ctx.clearRect(0,0,cWidth,cHeight);
     ctx.fillStyle = "grey";//"#000000";
