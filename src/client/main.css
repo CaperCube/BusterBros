@@ -1,9 +1,12 @@
 body {
     margin: 0px;
     padding: 0px;
+	text-align: center;
+	background-color: black;
 }
 
 #my_canvas {
+	margin: auto;
 	width: 800px;
 	height: 640px;
 	image-rendering: -moz-crisp-edges;

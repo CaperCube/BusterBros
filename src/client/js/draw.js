@@ -156,7 +156,7 @@ function DrawUI(cctx, worldB) {
     // Top
     //cctx.fillRect(0, 0, worldB.x, uiHeight);
     // Bottom
-    //cctx.fillRect(0, bottomUiY, worldB.x, uiHeight);
+    cctx.fillRect(0, bottomUiY, worldB.x, gridCellSize * 4);
 
     // Bottom
 
