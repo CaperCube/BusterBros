@@ -1,6 +1,8 @@
 let tileSheet = new Image();
+let defaultPlayer = new Image();
 //tileSheet.src = "src/smw_ts1.png";
 tileSheet.src = "src/busterbros_tiles.png";
+defaultPlayer.src = "src/Classic.png";
 
 const uiTiles = {
     tl: 923,

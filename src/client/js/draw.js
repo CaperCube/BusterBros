@@ -51,6 +51,7 @@ function DrawTile(cctx, tMap, tSize, idx, x, y) {
 function DrawPlayer(cctx, p) {
     // Draw player
     cctx.fillStyle = p.color;
+    /*
     cctx.beginPath();
     cctx.arc(
         (p.position.x + p.size.w / 2) + camera.position.x,
@@ -60,8 +61,24 @@ function DrawPlayer(cctx, p) {
         false
     );
     cctx.fill();
+    */
+    
+    // Flip context when player is facing left
+    if (p.dir < 0) {
+        cctx.translate(Math.round((p.position.x * 2) + gridCellSize - 1), 0);
+        cctx.scale(-1,1);
+    }
+
+    // Draw the chosen frame
+    cctx.drawImage(defaultPlayer, 0, 0, defaultPlayer.height, defaultPlayer.height,
+        Math.round(p.position.x + camera.position.x),
+        Math.floor(p.position.y + camera.position.y),
+        gridCellSize,
+        gridCellSize
+    );
     
     // Draw gun
+    /*
     cctx.fillStyle = "#555555";
     ctx.fillRect(
         (p.position.x + (p.dir * (gridCellSize * 0.5))) + camera.position.x,
@@ -69,7 +86,11 @@ function DrawPlayer(cctx, p) {
         gridCellSize * 0.8,
         gridCellSize/3
     );
+    */
     
+    // Reset context
+    cctx.setTransform(1,0,0,1,0,0);
+
     // Draw hp bar
     if (drawHp) DrawHeath(cctx, p);
     //if (p.id == 0)
