@@ -82,7 +82,7 @@ function DoGravity(p) {
         }
     }
     else if ((p.position.y + (p.size.h/2) + p.velocity.y) >= worldBounds.y) {
-        if (PlaceFree(p, p.position.x, (gridCellSize/2))) {
+        if (PlaceFree(p, p.position.x, 0)) {
             //wrap to top
             p.position = {x: p.position.x, y: (p.size.h/-2) + 2};
         }

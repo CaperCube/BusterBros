@@ -226,3 +226,19 @@ function DrawUI(cctx, worldB) {
         cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
     }
 }
+
+//
+// Background
+//
+
+function DrawBGCheckers() {
+    let gCount = 0;
+    for (var i = 0; i < cHeight/gridCellSize; i++) {
+        for (var j = 0; j < cWidth/gridCellSize; j++) {
+            if (gCount % 2 == 0) ctx.fillStyle = checkerColor1;
+            else ctx.fillStyle = checkerColor2;
+            ctx.fillRect(j*gridCellSize, i*gridCellSize, gridCellSize, gridCellSize);
+            gCount++
+        }
+    }
+}

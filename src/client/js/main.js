@@ -120,16 +120,35 @@ function Init() {
     // Setup room
     //LoadLevel(Level2);
     Walls = [];
-    for (var i = 0; i < tileMapLevel.length; i++) {
-        for (var j = 0; j < tileMapLevel[i].length; j++) {
-            if (tileMapLevel[i][j] != null) {
+    let levelToLoad = tileMapLevel3;
+
+    for (var i = 0; i < levelToLoad.length; i++) {
+        for (var j = 0; j < levelToLoad[i].length; j++) {
+            if (levelToLoad[i][j] != null) {
                 Walls.push(new TileWall(
                     gridCellSize * j,
                     gridCellSize * i,
-                    tileMapLevel[i][j]
+                    levelToLoad[i][j]
                 ));
             }
             else Walls.push(null);
+        }
+    }
+
+    // Load BG tiles
+    BGTiles = [];
+    let bgToLoad = tileBG1;
+
+    for (var i = 0; i < bgToLoad.length; i++) {
+        for (var j = 0; j < bgToLoad[i].length; j++) {
+            if (bgToLoad[i][j] != null) {
+                BGTiles.push(new TileWall(
+                    gridCellSize * j,
+                    gridCellSize * i,
+                    bgToLoad[i][j]
+                ));
+            }
+            else BGTiles.push(null);
         }
     }
 
@@ -157,22 +176,10 @@ function TempSpawnPlayer() {
     // Temporary player spawn override
     Players[0] = new Player(
         4 * gridCellSize,
-        3 * gridCellSize,
+        6 * gridCellSize,
         playerColors[0],
         0
     );
-}
-
-function DrawBGCheckers() {
-    let gCount = 0;
-    for (var i = 0; i < cHeight/gridCellSize; i++) {
-        for (var j = 0; j < cWidth/gridCellSize; j++) {
-            if (gCount % 2 == 0) ctx.fillStyle = checkerColor1;
-            else ctx.fillStyle = checkerColor2;
-            ctx.fillRect(j*gridCellSize, i*gridCellSize, gridCellSize, gridCellSize);
-            gCount++
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////
@@ -188,7 +195,10 @@ function RenderCanvas() {
     ctx.fillRect(0,0,cWidth,cHeight);
 
     // Draw tiled BG
-    DrawBGCheckers();
+    //DrawBGCheckers();
+    for (var i = 0; i < Walls.length; i++) {
+        if (BGTiles[i] != null && BGTiles[i] != undefined) DrawTile(ctx, tileSheet, gridCellSize, BGTiles[i].tileIndex, BGTiles[i].position.x, BGTiles[i].position.y);
+    }
     
     // Move camera
     if (cameraMove) CameraControl(camera);
