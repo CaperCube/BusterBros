@@ -48,7 +48,7 @@ function DrawTile(cctx, tMap, tSize, idx, x, y) {
     );
 }
 
-function DrawPlayer(cctx, p) {
+function DrawPlayer(cctx, sheet, p) {
     // Draw player
     cctx.fillStyle = p.color;
     /*
@@ -71,13 +71,18 @@ function DrawPlayer(cctx, p) {
 
     // Frame Index
     let framePos = 0;
-    // if no tile below player, show "jumping" frame
-    if (PlaceFree(p, p.position.x, p.position.y + gridCellSize/2) && (p.position.y + (p.size.h/2) + p.velocity.y) < worldBounds.y) framePos = defaultPlayer.height * 2;
-    // else if player is moving laterally, alternate "walking" frames
-    else if (Math.sin(frameCount / 3) > 0 && Math.abs(p.velocity.x) > 0.1) framePos = defaultPlayer.height;
+    
+    // if parrying
+    if (p.parry) framePos = sheet.height * 6;
+    else {
+        // if no tile below player, show "jumping" frame
+        if (PlaceFree(p, p.position.x, p.position.y + gridCellSize/2) && (p.position.y + (p.size.h/2) + p.velocity.y) < worldBounds.y) framePos = sheet.height * 2;
+        // else if player is moving laterally, alternate "walking" frames
+        else if (Math.sin(frameCount / 3) > 0 && Math.abs(p.velocity.x) > 0.1) framePos = sheet.height;
+    }
 
     // Draw the chosen frame
-    cctx.drawImage(defaultPlayer, framePos, 0, defaultPlayer.height, defaultPlayer.height,
+    cctx.drawImage(sheet, framePos, 0, sheet.height, sheet.height,
         Math.round(p.position.x + camera.position.x),
         Math.floor(p.position.y + camera.position.y),
         gridCellSize,
@@ -170,12 +175,15 @@ function DrawBullet(cctx, b) {
 //
 // UI
 //
-let inGameUI = {top: new Image(), bottom: new Image()};
-function InitUI() {
+let inGameUI = new Image();
+function InitUI(callback) {
     // draw ui tiles for the first time and store the resulting image in inGameUI;
+
+    // Save layer to comp
+    callback(cctx.canvas.toDataURL("image/png"));
 }
 
-function DrawUI(cctx, worldB) {
+function DrawUI(cctx, sheet, worldB) {
     //let uiHeight = (cctx.canvas.height - worldB.y);
     let bottomUiY = worldB.y;// + uiHeight;
     let rightMostTileX = cctx.canvas.width - gridCellSize;
@@ -189,41 +197,41 @@ function DrawUI(cctx, worldB) {
     // Bottom
 
     // Top Left
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.tl);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY, gridCellSize, gridCellSize);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.tl);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY, gridCellSize, gridCellSize);
     // Top Right
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.tr);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY, gridCellSize, gridCellSize);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.tr);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY, gridCellSize, gridCellSize);
     // Mid Left
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.ml);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + gridCellSize, gridCellSize, gridCellSize);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.ml);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + gridCellSize, gridCellSize, gridCellSize);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
     // Mid Right
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.mr);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + gridCellSize, gridCellSize, gridCellSize);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.mr);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + gridCellSize, gridCellSize, gridCellSize);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
     // Bottom Left
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.bl);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.bl);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, 0, bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
     // Bottom Right
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.br);
-    cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.br);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, rightMostTileX, bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
 
     // Horizontal
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.t);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.t);
     for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
-        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY, gridCellSize, gridCellSize);
+        cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY, gridCellSize, gridCellSize);
     }
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.m);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.m);
     for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
-        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + gridCellSize, gridCellSize, gridCellSize);
+        cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + gridCellSize, gridCellSize, gridCellSize);
     }
     for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
-        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
+        cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (2 * gridCellSize), gridCellSize, gridCellSize);
     }
-    tile = GetPosByIndex(tileSheet, gridCellSize, uiTiles.b);
+    tile = GetPosByIndex(sheet, gridCellSize, uiTiles.b);
     for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
-        cctx.drawImage(tileSheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
+        cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
     }
 }
 
@@ -241,4 +249,14 @@ function DrawBGCheckers() {
             gCount++
         }
     }
+}
+
+function CompositLayer(cctx, tSheet, tiles, callback) {
+    // Draw layer
+    for (var i = 0; i < tiles.length; i++) {
+        if (tiles[i] != null && tiles[i] != undefined) DrawTile(cctx, tSheet, gridCellSize, tiles[i].tileIndex, tiles[i].position.x, tiles[i].position.y);
+    }
+
+    // Save layer to comp
+    callback(cctx.canvas.toDataURL("image/png"));
 }

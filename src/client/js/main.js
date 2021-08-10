@@ -23,9 +23,14 @@ let isPaused = true;
 let frameCount = 0;
 
 ////////////////////////////////////////////////////////
+// Draw vars
+////////////////////////////////////////////////////////
+let bgLayerComp;
+
+////////////////////////////////////////////////////////
 // Game vars
 ////////////////////////////////////////////////////////
-let gravity = 0.1;
+let gravity = 0.08;//0.1;
 let friction = 0.8;
 let bounce = 0.2;
 
@@ -117,27 +122,9 @@ function LoadLevel(l) {
     }
 }
 function Init() {
-    // Setup room
-    //LoadLevel(Level2);
-    Walls = [];
-    let levelToLoad = tileMapLevel3;
-
-    for (var i = 0; i < levelToLoad.length; i++) {
-        for (var j = 0; j < levelToLoad[i].length; j++) {
-            if (levelToLoad[i][j] != null) {
-                Walls.push(new TileWall(
-                    gridCellSize * j,
-                    gridCellSize * i,
-                    levelToLoad[i][j]
-                ));
-            }
-            else Walls.push(null);
-        }
-    }
-
     // Load BG tiles
     BGTiles = [];
-    let bgToLoad = tileBG1;
+    let bgToLoad = tileBG2;
 
     for (var i = 0; i < bgToLoad.length; i++) {
         for (var j = 0; j < bgToLoad[i].length; j++) {
@@ -149,6 +136,30 @@ function Init() {
                 ));
             }
             else BGTiles.push(null);
+        }
+    }
+
+    // Set up background
+    CompositLayer(ctx, loadedImages[MAIN_SHEET], BGTiles, (data) => {
+        bgLayerComp = new Image(canvas.width, canvas.height);
+        bgLayerComp.src = data;
+    });
+
+    // Setup room
+    //LoadLevel(Level2);
+    Walls = [];
+    let levelToLoad = tileMapLevel4;
+
+    for (var i = 0; i < levelToLoad.length; i++) {
+        for (var j = 0; j < levelToLoad[i].length; j++) {
+            if (levelToLoad[i][j] != null) {
+                Walls.push(new TileWall(
+                    gridCellSize * j,
+                    gridCellSize * i,
+                    levelToLoad[i][j]
+                ));
+            }
+            else Walls.push(null);
         }
     }
 
@@ -166,7 +177,7 @@ function Init() {
     
     // Start rendering
     //RenderCanvas();
-    console.log(Walls[0]);
+    //console.log(Walls);
     PlayPause();
 }
 
@@ -196,9 +207,7 @@ function RenderCanvas() {
 
     // Draw tiled BG
     //DrawBGCheckers();
-    for (var i = 0; i < Walls.length; i++) {
-        if (BGTiles[i] != null && BGTiles[i] != undefined) DrawTile(ctx, tileSheet, gridCellSize, BGTiles[i].tileIndex, BGTiles[i].position.x, BGTiles[i].position.y);
-    }
+    ctx.drawImage(bgLayerComp, 0, 0, canvas.width, canvas.height);
     
     // Move camera
     if (cameraMove) CameraControl(camera);
@@ -207,7 +216,7 @@ function RenderCanvas() {
     for (var i = 0; i < Walls.length; i++) {
         //DrawWall(ctx, Walls[i]);
         //DrawTile(cctx, tMap, tSize, idx, x, y)
-        if (Walls[i] != null && Walls[i] != undefined) DrawTile(ctx, tileSheet, gridCellSize, Walls[i].tileIndex, Walls[i].position.x, Walls[i].position.y);
+        if (Walls[i] != null && Walls[i] != undefined) DrawTile(ctx, loadedImages[MAIN_SHEET], gridCellSize, Walls[i].tileIndex, Walls[i].position.x, Walls[i].position.y);
     }
     // Draw Spawns
     /*
@@ -229,15 +238,15 @@ function RenderCanvas() {
     // Draw Players
     for (var i = 0; i < Players.length; i++) {
         if (!isPaused) UpdatePlayer(Players[i]);
-        DrawPlayer(ctx, Players[i]);
+        DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[i]);
     }
     // Draw NetPlayers
     for (var i = 0; i < NetPlayers.length; i++) {
-        DrawPlayer(ctx, NetPlayers[i]);
+        DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], NetPlayers[i]);
     }
     
     // UI layer
-    DrawUI(ctx, worldBounds);
+    DrawUI(ctx, loadedImages[MAIN_SHEET], worldBounds);
 
     // Render again again (change this to a setInterval())
 }
@@ -248,4 +257,5 @@ function PlayPause() {
     else renderInterval = setInterval(RenderCanvas, (1/fps)*1000);
 }
 
-Init();
+PreloadImages(imageSRC, Init);
+//Init();

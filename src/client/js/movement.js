@@ -142,6 +142,12 @@ function ControlLoopPlatformer(p) {
     Controls.Player1.fire1[0].onPress = shootfunc;
     Controls.Player1.fire1[1].onPress = shootfunc;
     
+    // Parry
+    if (GetInput(Controls.Player1.downAxis1)) {
+        p.parry = true;
+    }
+    else p.parry = false;
+
     // Update position
     UpdatePositionX(p);
     DoGravity(p);

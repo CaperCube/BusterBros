@@ -64,11 +64,12 @@ function Player(ix, iy, color, pid) {
     this.color = color || playerColors[0];
     
     // Movement vars
-    this.moveSpeed = 0.5;
+    this.moveSpeed = 0.4;
     this.dir = 1;
+    this.parry = false; // temporary
     
-    this.jumpSpeed = 3.2;
-    this.totalJumps = 2;
+    this.jumpSpeed = 2.8;//3.2;
+    this.totalJumps = 1;
     this.usedJumps = 0;
     
     //Other vars
