@@ -46,9 +46,17 @@ io.sockets.on('connection', function(socket) {
     console.log(`Welcome ${socket.ID}!`);
 
     ///////////////////////////////////////
+    // Client join
+    ///////////////////////////////////////
+    // Tell new player their ID
+    socket.emit('joinConfirm', socket.ID);
+    // Add player to game's playerlist
+    serverGame.netPlayers.push(socket.player);
+
+    ///////////////////////////////////////
     // Generate and init server-side message listeners from NetGame object
     ///////////////////////////////////////
-    socket.on('startGame', function(){
+    socket.on('startGame', function() {
         // Start the game!
         serverGame.StartGame(SOCKET_LIST);
     });
@@ -57,11 +65,13 @@ io.sockets.on('connection', function(socket) {
         // Get player with this socket.ID (if they exist)
         if (serverGame != null) {
 
-            let myPlayer = serverGame[socket.ID];
-            if (myPlayer != null) {
-
+            //let myPlayer = serverGame[socket.ID];
+            if (socket.player != null) {
                 // Move net player
-                myPlayer.position = data.position;
+                socket.player.position = data.position;
+                socket.player.dir = data.dir;
+                socket.player.parry = data.parry;
+                //console.log(socket.player.position);
             }
         }
     });
@@ -90,6 +100,7 @@ io.sockets.on('connection', function(socket) {
     socket.on('disconnect', function(){
         // Remove player (if applicable)
         //SOCKET_LIST.splice(socket.ID, 1);
+        serverGame.netPlayers.splice(socket.ID, 1);
         delete SOCKET_LIST[socket.ID];
 
         //console.log(SOCKET_LIST);

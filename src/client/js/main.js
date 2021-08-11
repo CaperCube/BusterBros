@@ -18,7 +18,9 @@ function setCanvasSize(w,h) {
 }
 
 let renderInterval;
+let networkInterval;
 let fps = 90;
+let networkFps = 30;
 let isPaused = true;
 let frameCount = 0;
 
@@ -30,6 +32,22 @@ let bgLayerComp;
 ////////////////////////////////////////////////////////
 // Game vars
 ////////////////////////////////////////////////////////
+let myID = 0;
+
+socket.on(`joinConfirm`, function(data){
+    // Set my ID on connect to network
+    myID = data;
+    console.log(myID);
+
+    // Temporary player spawn override
+    Players[0] = new Player(
+        4 * gridCellSize,
+        6 * gridCellSize,
+        playerColors[0],
+        myID
+    );
+});
+
 let gravity = 0.08;//0.1;
 let friction = 0.8;
 let bounce = 0.2;
@@ -184,13 +202,9 @@ function Init() {
 Buttons.r.onPress = TempSpawnPlayer;
 
 function TempSpawnPlayer() {
-    // Temporary player spawn override
-    Players[0] = new Player(
-        4 * gridCellSize,
-        6 * gridCellSize,
-        playerColors[0],
-        0
-    );
+
+    // Start game
+    startGame();
 }
 
 ////////////////////////////////////////////////////////
@@ -236,10 +250,15 @@ function RenderCanvas() {
         if (Bullets[i] != null) DrawBullet(ctx, Bullets[i]);
     }
     // Draw Players
+    if (!isPaused) UpdatePlayer(Players[0]);
+    /*
     for (var i = 0; i < Players.length; i++) {
-        if (!isPaused) UpdatePlayer(Players[i]);
+        //if (!isPaused) UpdatePlayer(Players[i]);
         DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[i]);
     }
+    */
+    for (var p in Players) DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[p]);
+
     // Draw NetPlayers
     for (var i = 0; i < NetPlayers.length; i++) {
         DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], NetPlayers[i]);
@@ -251,11 +270,23 @@ function RenderCanvas() {
     // Render again again (change this to a setInterval())
 }
 
-function PlayPause() {
-    isPaused = !isPaused;
-    if (isPaused) clearInterval(renderInterval);
-    else renderInterval = setInterval(RenderCanvas, (1/fps)*1000);
+function NetworkSendTick() {
+    // Send client's data to network
+    if (Players[0]) SendPlayerData(Players[0]);
 }
 
+function PlayPause() {
+    isPaused = !isPaused;
+    if (isPaused) {
+        clearInterval(renderInterval);
+        //clearInterval(networkInterval);
+    }
+    else {
+        renderInterval = setInterval(RenderCanvas, (1/fps)*1000);
+        //networkInterval = setInterval(NetworkSendTick, (1/networkFps)*1000);
+    }
+}
+
+// Preload images and init stage when done
 PreloadImages(imageSRC, Init);
 //Init();

@@ -104,9 +104,9 @@ function DrawPlayer(cctx, sheet, p) {
     cctx.setTransform(1,0,0,1,0,0);
 
     // Draw hp bar
-    if (drawHp) DrawHeath(cctx, p);
+    //if (drawHp) DrawHeath(cctx, p);
     //if (p.id == 0)
-    DrawAmmo(cctx, p);
+    //DrawAmmo(cctx, p);
 }
 
 function DrawHeath(cctx, p) {

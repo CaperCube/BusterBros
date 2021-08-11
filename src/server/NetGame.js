@@ -21,7 +21,7 @@ function NetGame() {
     //this.host = "";
 
     this.gameOptions = {
-        serverTickTime: 1000/30, // 1000/fps (this is the time between messages sent to connected players)
+        serverTickTime: 1000/40, // 1000/fps (this is the time between messages sent to connected players)
         stompsToWin: 10,
         stompThreshhold: 10
     };
@@ -69,18 +69,18 @@ function NetGame() {
         ////////////////////////////
         // Update NetEntities
         ////////////////////////////
-
+        /*
         for (var i = 0; i < this.netEntities.length; i++) {
             //if (this.netEntities[i].type)
             this.netEntities[i].update();
         }
+        */
 
         ////////////////////////////
         // Assemble server packet
         ////////////////////////////
-
         this.serverPacket.players = this.netPlayers;
-        this.serverPacket.entities = this.netEntities;
+        //this.serverPacket.entities = this.netEntities;
 
         ////////////////////////////
         // Send updates to connected players
@@ -137,6 +137,9 @@ function NetPlayer(ID) {
     // Player data
     //
     this.score = 0;
+    this.position = {x: 0, y: 0};
+    this.dir = 1;
+    this.parry = false;
 
     this.update = function() {
         //

@@ -7,14 +7,6 @@ const imageSRC = [
 const MAIN_SHEET = 0;
 const PLAYER_SPRITE = 1;
 
-//let tileSheet = new Image();
-//let defaultPlayer = new Image();
-//tileSheet.src = "src/smw_ts1.png";
-//tileSheet.src = "src/busterbros_tiles.png";
-//defaultPlayer.src = "src/Classic.png";
-
-//tileSheet.isLoaded = function() {tileSheet.complete && tileSheet.naturalHeight !== 0};
-
 const uiTiles = {
     tl: 923,
     t: 924,
