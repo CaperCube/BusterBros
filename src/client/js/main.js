@@ -34,20 +34,6 @@ let bgLayerComp;
 ////////////////////////////////////////////////////////
 let myID = 0;
 
-socket.on(`joinConfirm`, function(data){
-    // Set my ID on connect to network
-    myID = data;
-    console.log(myID);
-
-    // Temporary player spawn override
-    Players[0] = new Player(
-        4 * gridCellSize,
-        6 * gridCellSize,
-        playerColors[0],
-        myID
-    );
-});
-
 let gravity = 0.08;//0.1;
 let friction = 0.8;
 let bounce = 0.2;
@@ -110,40 +96,15 @@ function CameraControl(c) {
     if (Buttons.k.pressed) c.position.y += c.speed;
     if (Buttons.j.pressed) c.position.x -= c.speed;
     if (Buttons.l.pressed) c.position.x += c.speed;
+    if (Buttons.o.pressed) c.position = {x: 0, y: 0};
 }
 
 ////////////////////////////////////////////////////////
 // Init
 ////////////////////////////////////////////////////////
-function LoadLevel(l) {
-    // Clear old level
-    Walls = [];
-    
-    // Load new one
-    for (var i = 0; i < l.walls.length; i++) {
-        Walls[i] = new Wall(
-            l.walls[i].w * gridCellSize,
-            l.walls[i].h * gridCellSize,
-            l.walls[i].x * gridCellSize,
-            l.walls[i].y * gridCellSize
-        );
-    }
-    
-    // Spawns
-    for (var i = 0; i < l.spawns.length; i++) {
-        Spawns[i] = new Spawn(
-            l.spawns[i].x * gridCellSize,
-            l.spawns[i].y * gridCellSize,
-            playerColors[l.spawns[i].player] + "66",
-            l.spawns[i].player
-        );
-    }
-}
-function Init() {
+function LoadLevel(bgToLoad, levelToLoad) {
     // Load BG tiles
     BGTiles = [];
-    let bgToLoad = tileBG2;
-
     for (var i = 0; i < bgToLoad.length; i++) {
         for (var j = 0; j < bgToLoad[i].length; j++) {
             if (bgToLoad[i][j] != null) {
@@ -157,17 +118,14 @@ function Init() {
         }
     }
 
-    // Set up background
+    // Flatten background
     CompositLayer(ctx, loadedImages[MAIN_SHEET], BGTiles, (data) => {
         bgLayerComp = new Image(canvas.width, canvas.height);
         bgLayerComp.src = data;
     });
 
     // Setup room
-    //LoadLevel(Level2);
     Walls = [];
-    let levelToLoad = tileMapLevel4;
-
     for (var i = 0; i < levelToLoad.length; i++) {
         for (var j = 0; j < levelToLoad[i].length; j++) {
             if (levelToLoad[i][j] != null) {
@@ -180,32 +138,48 @@ function Init() {
             else Walls.push(null);
         }
     }
-
-    // Setup Players
-    for (var i = 0; i < Spawns.length; i++) {
-        if (Spawns[i].player == 0) {
-            Players[0] = new Player(
-                Spawns[i].position.x,
-                Spawns[i].position.y,
-                playerColors[0],
-                0
-            );
-        }
+    
+    /*
+    // Spawns
+    for (var i = 0; i < l.spawns.length; i++) {
+        Spawns[i] = new Spawn(
+            l.spawns[i].x * gridCellSize,
+            l.spawns[i].y * gridCellSize,
+            playerColors[l.spawns[i].player] + "66",
+            l.spawns[i].player
+        );
     }
+    */
+}
+
+function Init() {
+    // Setup level
+    LoadLevel(tileBG2, tileMapLevel2);
     
     // Start rendering
-    //RenderCanvas();
-    //console.log(Walls);
     PlayPause();
+}
+
+function TempSpawnPlayer() {
+    // Start game
+    startGame();
 }
 
 Buttons.r.onPress = TempSpawnPlayer;
 
-function TempSpawnPlayer() {
+socket.on(`joinConfirm`, function(data){
+    // Set my ID on connect to network
+    myID = data;
+    console.log(myID);
 
-    // Start game
-    startGame();
-}
+    // Temporary player spawn override
+    Players[0] = new Player(
+        4 * gridCellSize,
+        6 * gridCellSize,
+        playerColors[0],
+        myID
+    );
+});
 
 ////////////////////////////////////////////////////////
 // Render
@@ -228,8 +202,6 @@ function RenderCanvas() {
 
     // Draw Walls
     for (var i = 0; i < Walls.length; i++) {
-        //DrawWall(ctx, Walls[i]);
-        //DrawTile(cctx, tMap, tSize, idx, x, y)
         if (Walls[i] != null && Walls[i] != undefined) DrawTile(ctx, loadedImages[MAIN_SHEET], gridCellSize, Walls[i].tileIndex, Walls[i].position.x, Walls[i].position.y);
     }
     // Draw Spawns
@@ -251,18 +223,7 @@ function RenderCanvas() {
     }
     // Draw Players
     if (!isPaused) UpdatePlayer(Players[0]);
-    /*
-    for (var i = 0; i < Players.length; i++) {
-        //if (!isPaused) UpdatePlayer(Players[i]);
-        DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[i]);
-    }
-    */
     for (var p in Players) DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[p]);
-
-    // Draw NetPlayers
-    for (var i = 0; i < NetPlayers.length; i++) {
-        DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], NetPlayers[i]);
-    }
     
     // UI layer
     DrawUI(ctx, loadedImages[MAIN_SHEET], worldBounds);

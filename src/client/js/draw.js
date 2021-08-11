@@ -65,7 +65,7 @@ function DrawPlayer(cctx, sheet, p) {
     
     // Flip context when player is facing left
     if (p.dir < 0) {
-        cctx.translate(Math.round((p.position.x * 2) + gridCellSize - 1), 0);
+        cctx.translate(Math.round((p.position.x * 2) + gridCellSize - 1 + (camera.position.x * 2)), 0);
         cctx.scale(-1,1);
     }
 
