@@ -1,9 +1,9 @@
 function testButtonDown() {
-    console.log(Object.values(this)[0] + " down");
+    //console.log(Object.values(this)[0] + " down");
 }
 
 function testButtonUp() {
-    console.log(Object.values(this)[0] + " up");
+    //console.log(Object.values(this)[0] + " up");
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

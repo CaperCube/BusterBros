@@ -28,6 +28,7 @@ serv.listen(port);
 ////////////////////////////////////////
 
 //let newPlayer = new nGame.NetPlayer("Stinky");
+let netUtils = new nGame.Utils();
 let serverGame = new nGame.NetGame();
 //newGame.netEntities[0] = newPlayer;
 
@@ -49,14 +50,23 @@ io.sockets.on('connection', function(socket) {
     // Client join
     ///////////////////////////////////////
     // Tell new player their ID
-    socket.emit('joinConfirm', socket.ID);
+    socket.emit('joinConfirm', {level: serverGame.level, id: socket.ID});
     // Add player to game's playerlist
-    serverGame.netPlayers.push(socket.player);
+    //serverGame.netPlayers.push(socket.player);
+    serverGame.netPlayers[socket.ID] = socket.player;
 
     ///////////////////////////////////////
     // Generate and init server-side message listeners from NetGame object
     ///////////////////////////////////////
-    socket.on('startGame', function() {
+    socket.on('clientStartGame', function(data) {
+        // Init the level from the start game request
+        serverGame.level = data.level;
+
+        // Send to all players the server level
+        for (var sID in SOCKET_LIST) {
+            if (sID != socket.ID) SOCKET_LIST[sID].emit('loadServersLevel', serverGame.level);
+        }
+
         // Start the game!
         serverGame.StartGame(SOCKET_LIST);
     });
@@ -72,6 +82,38 @@ io.sockets.on('connection', function(socket) {
                 socket.player.dir = data.dir;
                 socket.player.parry = data.parry;
                 //console.log(socket.player.position);
+            }
+        }
+    });
+
+    socket.on('clientAddTile', function(data){
+        // Is the game running?
+        //if (serverGame != null) {
+        if (serverGame && serverGame.serverTickRef) {
+            // Add tile to server level
+            if (serverGame.level) serverGame.level.push(data);
+
+            // Tell other players that a tile has been placed
+            for (var sID in SOCKET_LIST) {
+                if (sID != socket.ID) SOCKET_LIST[sID].emit('serverAddTile', data);
+            }
+        }
+    });
+
+    socket.on('clientRemoveTile', function(data){
+        // Is the game running?
+        //if (serverGame != null) {
+        if (serverGame && serverGame.serverTickRef) {
+            // Remove tile from server level
+            if (serverGame.level) {
+                let tileHere = netUtils.BlockHere(serverGame, {size: serverGame.gridCellSize}, data.position.x, data.position.y);
+                let tileIndex = serverGame.level.indexOf(tileHere);
+                serverGame.level.splice(tileIndex, 1);
+            }
+
+            // Tell other players that a tile has been placed
+            for (var sID in SOCKET_LIST) {
+                if (sID != socket.ID) SOCKET_LIST[sID].emit('serverRemoveTile', data);
             }
         }
     });
@@ -100,7 +142,12 @@ io.sockets.on('connection', function(socket) {
     socket.on('disconnect', function(){
         // Remove player (if applicable)
         //SOCKET_LIST.splice(socket.ID, 1);
-        serverGame.netPlayers.splice(socket.ID, 1);
+        // Tell others that I left
+        for (var sID in SOCKET_LIST) {
+            if (sID != socket.ID) SOCKET_LIST[sID].emit(`serverPlayerLeft`, socket.ID);
+        }
+        //serverGame.netPlayers.splice(socket.ID, 1);
+        delete serverGame.netPlayers[socket.ID];
         delete SOCKET_LIST[socket.ID];
 
         //console.log(SOCKET_LIST);

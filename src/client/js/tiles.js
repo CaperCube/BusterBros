@@ -2,10 +2,12 @@ let loadedImages = [];
 const imageSRC = [
     "src/busterbros_tiles.png",
     //"src/Classic.png"
-    "src/Char1.png"
+    "src/Char1.png",
+    "src/Char2.png"
 ];
 const MAIN_SHEET = 0;
 const PLAYER_SPRITE = 1;
+const PLAYER_OTHER_SPRITE = 2;
 
 const uiTiles = {
     tl: 923,

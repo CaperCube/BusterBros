@@ -4,10 +4,33 @@ function CreateMyPlayer() {
     socket.emit(`createPlayer`);
 }
 
-function startGame() {
-    socket.emit(`startGame`);
+socket.on(`serverPlayerLeft`, function(data){
+    console.log(`Player ${data} has left`);
+    
+    //console.log(Players);
+    //delete Players[Players[data].id];
+    //delete Players[data];
+    Players[data] = undefined;
+    //console.log(Players);
+    /*
+    for (var p in Players) {
+        if (Players[p].id === data) Players.splice(Players[p].id, 1);
+    }
+    */
+});
+
+function startGame(myLevel) {
+    // Delete all players except mine
+    for (var p in Players) if (Players[p].id != myID) Players.splice(Players[p], 1);
+    // Send request to start net game
+    socket.emit(`clientStartGame`, {level: myLevel});
 }
 //Buttons.s.onPress = startGame;
+
+socket.on(`loadServersLevel`, function(data){
+    console.log(`Server has given us a new level`);
+    Walls = data;
+});
 
 socket.on(`ServerPacket`, function(data){
     //
@@ -16,8 +39,10 @@ socket.on(`ServerPacket`, function(data){
 
     //for (var nPlayer in data) {
     for (var i = 0; i < data.players.length; i++) {
+    //for (var p in data.players) {
         //console.log(data.players[i]);
         let nPlayer = data.players[i];
+        //let nPlayer = data.players[p];
 
         //console.log(Players[nPlayer.socketID]);
 
@@ -41,11 +66,11 @@ socket.on(`ServerPacket`, function(data){
         // This is the client, send my movement data to server
         else {
             //
-            if (Players[0]) {
+            if (Players[myID]) {
                 let playerData = {
-                    position: Players[0].position,
-                    dir: Players[0].dir,
-                    parry: Players[0].parry
+                    position: Players[myID].position,
+                    dir: Players[myID].dir,
+                    parry: Players[myID].parry
                 };
                 SendPlayerData(playerData);
             }
@@ -56,6 +81,30 @@ socket.on(`ServerPacket`, function(data){
 function SendPlayerData(p) {
     socket.emit(`clientMove`, p);
 }
+
+// Send and recive tile updates
+function SendNewTile(newTile) {
+    socket.emit(`clientAddTile`, newTile);
+}
+
+function SendRemovedTile(newTile) {
+    socket.emit(`clientRemoveTile`, newTile);
+}
+
+socket.on(`serverAddTile`, function(data){
+    let newTile = new TileWall(
+        data.position.x,
+        data.position.y,
+        data.tileIndex
+    );
+    Walls.push(newTile);
+});
+
+socket.on(`serverRemoveTile`, function(data){
+    let tileHere = BlockHere({size: Players[myID].size}, data.position.x, data.position.y);
+    let tileIndex = Walls.indexOf(tileHere);
+    Walls.splice(tileIndex, 1);
+});
 
 /*
 socket.on(`clientMove`, function(data){

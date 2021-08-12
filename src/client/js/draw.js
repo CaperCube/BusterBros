@@ -65,7 +65,7 @@ function DrawPlayer(cctx, sheet, p) {
     
     // Flip context when player is facing left
     if (p.dir < 0) {
-        cctx.translate(Math.round((p.position.x * 2) + gridCellSize - 1 + (camera.position.x * 2)), 0);
+        cctx.translate(Math.round((p.position.x * 2) + gridCellSize + (camera.position.x * 2)), 0);
         cctx.scale(-1,1);
     }
 
@@ -107,6 +107,13 @@ function DrawPlayer(cctx, sheet, p) {
     //if (drawHp) DrawHeath(cctx, p);
     //if (p.id == 0)
     //DrawAmmo(cctx, p);
+
+    // Draw tile selection
+    cctx.strokeStyle = '#00FF00';
+    cctx.lineWidth = 1;
+    cctx.strokeRect(p.cursor.x + 0.5, p.cursor.y + 0.5, gridCellSize - 1, gridCellSize - 1);
+    cctx.strokeStyle = '#FFFFFF88';
+    cctx.strokeRect(p.cursor.x - 0.5, p.cursor.y - 0.5, gridCellSize + 1, gridCellSize + 1);
 }
 
 function DrawHeath(cctx, p) {
@@ -233,6 +240,10 @@ function DrawUI(cctx, sheet, worldB) {
     for (var i = 1; i < (cctx.canvas.width / gridCellSize) - 1; i++) {
         cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (i * gridCellSize), bottomUiY + (3 * gridCellSize), gridCellSize, gridCellSize);
     }
+
+    // Draw players items and such
+    tile = GetPosByIndex(sheet, gridCellSize, Players[myID].block);
+    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (1 * gridCellSize), bottomUiY + (1 * gridCellSize), gridCellSize, gridCellSize);
 }
 
 //

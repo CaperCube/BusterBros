@@ -72,6 +72,13 @@ function Player(ix, iy, color, pid) {
     this.totalJumps = 1;
     this.usedJumps = 0;
     
+    // Building vars
+    this.cursor = {
+        x: -2 * gridCellSize,
+        y: -2 * gridCellSize
+    };
+    this.block = 155;
+
     //Other vars
     this.health = 100;
     

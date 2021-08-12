@@ -15,13 +15,14 @@ function NetGame() {
     this.serverTickRef; // This will hold the setInterval reference for the server updates
     this.gameID = GenerateID();
 
+    this.gridCellSize = 16; // This should be a constant
     this.level = null; // The level that's served to each player when a game is started
     this.netEntities = []; // powerups, hazards, etc.
     this.netPlayers = []; // players only
     //this.host = "";
 
     this.gameOptions = {
-        serverTickTime: 1000/40, // 1000/fps (this is the time between messages sent to connected players)
+        serverTickTime: 1000/60, // 1000/fps (this is the time between messages sent to connected players)
         stompsToWin: 10,
         stompThreshhold: 10
     };
@@ -79,7 +80,12 @@ function NetGame() {
         ////////////////////////////
         // Assemble server packet
         ////////////////////////////
-        this.serverPacket.players = this.netPlayers;
+        this.serverPacket.players = [];
+        for (var p in this.netPlayers) {
+            this.serverPacket.players.push(this.netPlayers[p]);
+        }
+        //this.serverPacket.players = this.netPlayers;
+        //console.log(this.serverPacket.players);
         //this.serverPacket.entities = this.netEntities;
 
         ////////////////////////////
@@ -145,4 +151,42 @@ function NetPlayer(ID) {
         //
         console.log("**** " + this.name + " updated! ****");
     }
+}
+
+module.exports.Utils = Utils;
+function Utils() {
+    this.BlockHere = function(sGame, p, xNew, yNew) {
+        var temp = {
+            x: xNew + 2,
+            y: yNew + 4,
+            w: p.size.w - 4,
+            h: p.size.h - 4
+        };
+        for (var i = 0; i < sGame.level.length; i++) {
+            var wallTemp = null;
+            if (sGame.level[i] != null) {
+                wallTemp = {
+                    x: sGame.level[i].position.x,
+                    y: sGame.level[i].position.y,
+                    w: sGame.gridCellSize,
+                    h: sGame.gridCellSize
+                };
+            }
+            if (wallTemp !== null && this.Collision(temp, wallTemp)) {
+                return sGame.level[i];
+            }
+        }
+        return null;
+    }
+
+    this.Collision = function(r1, r2) {
+        if (r1.x + r1.w > r2.x &&
+            r1.x < r2.x + r2.w &&
+            r2.y + r2.h > r1.y &&
+            r2.y < r1.y + r1.h) {
+            return true;
+        } else {
+            return false;
+        }
+    };
 }

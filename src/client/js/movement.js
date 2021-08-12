@@ -124,8 +124,8 @@ function ControlLoopPlatformer(p) {
             p.velocity.y = -p.jumpSpeed;
         }
     }
-    Controls.Player1.upAxis1[0].onPress = jumpfunc;
-    Controls.Player1.upAxis1[1].onPress = jumpfunc;
+    
+    Controls.Player1.upAxis1.forEach(b => b.onPress = jumpfunc);
     
     // Shoot
     function shootfunc() {
@@ -139,14 +139,63 @@ function ControlLoopPlatformer(p) {
             p.usedAmmo++;
         }
     }
-    Controls.Player1.fire1[0].onPress = shootfunc;
-    Controls.Player1.fire1[1].onPress = shootfunc;
+    
+    //Controls.Player1.fire1.forEach(b => b.onPress = jumpfunc);
     
     // Parry
     if (GetInput(Controls.Player1.downAxis1)) {
         p.parry = true;
     }
     else p.parry = false;
+
+    // Build
+    let pX = ((gridCellSize + p.size.w/2) * p.dir);
+    let pY = 0;
+    if (p.parry) {
+        pX = (gridCellSize/8 + p.size.w/8) * p.dir;
+        pY = (gridCellSize + p.size.h/3);
+    }
+    p.cursor = {
+        x: Math.round((p.position.x + camera.position.x + pX) / gridCellSize) * gridCellSize,
+        y: Math.round((p.position.y + camera.position.y + pY) / gridCellSize) * gridCellSize
+    };
+
+    function buildfunc() {
+        let tileHere = BlockHere({size: p.size}, p.cursor.x, p.cursor.y);
+        if (tileHere == null) {
+            let newTile = new TileWall(
+                p.cursor.x,
+                p.cursor.y,
+                p.block
+            );
+            Walls.push(newTile);
+
+            //console.log(`Build at X: ${p.cursor.x} Y: ${p.cursor.y}`);
+            // Send message to server
+            SendNewTile(newTile);
+        }
+        else {
+            console.log(`Remove at X: ${p.cursor.x} Y: ${p.cursor.y}`);
+            let tileIndex = Walls.indexOf(tileHere);
+            Walls.splice(tileIndex, 1);
+            // Send message to server
+
+            SendRemovedTile(tileHere);
+        }
+    }
+
+    Controls.Player1.fire1.forEach(b => b.onPress = buildfunc);
+
+    // Change block
+    Controls.Player1.invUp.forEach(b => b.onPress = () => {
+        p.block++;
+        if (p.block > 1023) p.block = 0;
+    });
+
+    Controls.Player1.invDown.forEach(b => b.onPress = () => {
+        p.block--;
+        if (p.block < 0) p.block = 1023;
+    });
 
     // Update position
     UpdatePositionX(p);
@@ -199,6 +248,30 @@ function PlaceFree(p, xNew, yNew) {
         }
     }
     return true;
+}
+
+function BlockHere(p, xNew, yNew) {
+    var temp = {
+        x: xNew + 2,
+        y: yNew + 4,
+        w: p.size.w - 4,
+        h: p.size.h - 4
+    };
+    for (var i = 0; i < Walls.length; i++) {
+        var wallTemp = null;
+        if (Walls[i] != null) {
+            wallTemp = {
+                x: Walls[i].position.x,
+                y: Walls[i].position.y,
+                w: gridCellSize,
+                h: gridCellSize
+            };
+        }
+        if (wallTemp !== null && Collision(temp, wallTemp)) {
+            return Walls[i];
+        }
+    }
+    return null;
 }
 
 function PlaceFreeCustom(p, xNew, yNew, list) {

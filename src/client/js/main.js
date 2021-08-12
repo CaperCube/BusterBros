@@ -125,17 +125,19 @@ function LoadLevel(bgToLoad, levelToLoad) {
     });
 
     // Setup room
-    Walls = [];
-    for (var i = 0; i < levelToLoad.length; i++) {
-        for (var j = 0; j < levelToLoad[i].length; j++) {
-            if (levelToLoad[i][j] != null) {
-                Walls.push(new TileWall(
-                    gridCellSize * j,
-                    gridCellSize * i,
-                    levelToLoad[i][j]
-                ));
+    if (Walls.length === 0) {
+        Walls = [];
+        for (var i = 0; i < levelToLoad.length; i++) {
+            for (var j = 0; j < levelToLoad[i].length; j++) {
+                if (levelToLoad[i][j] != null) {
+                    Walls.push(new TileWall(
+                        gridCellSize * j,
+                        gridCellSize * i,
+                        levelToLoad[i][j]
+                    ));
+                }
+                else Walls.push(null);
             }
-            else Walls.push(null);
         }
     }
     
@@ -162,18 +164,27 @@ function Init() {
 
 function TempSpawnPlayer() {
     // Start game
-    startGame();
+    startGame(Walls);
 }
 
 Buttons.r.onPress = TempSpawnPlayer;
 
 socket.on(`joinConfirm`, function(data){
+    // Load server's leve
+    if (data.level) {
+        Walls = data.level;
+        console.log(`Level loaded from server`);
+    }
+    else {
+        console.log(`Using default level`);
+    }
+
     // Set my ID on connect to network
-    myID = data;
+    myID = data.id;
     console.log(myID);
 
     // Temporary player spawn override
-    Players[0] = new Player(
+    Players[myID] = new Player(
         4 * gridCellSize,
         6 * gridCellSize,
         playerColors[0],
@@ -222,8 +233,15 @@ function RenderCanvas() {
         if (Bullets[i] != null) DrawBullet(ctx, Bullets[i]);
     }
     // Draw Players
-    if (!isPaused) UpdatePlayer(Players[0]);
-    for (var p in Players) DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[p]);
+    if (!isPaused) UpdatePlayer(Players[myID]);
+    for (var p in Players) {
+        if (Players[p] != undefined) {
+            // If drawing client player, use default skin
+            if (Players[p].id === myID) DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[p]);
+            // else use alternate skin
+            else DrawPlayer(ctx, loadedImages[PLAYER_OTHER_SPRITE], Players[p]);
+        }
+    }
     
     // UI layer
     DrawUI(ctx, loadedImages[MAIN_SHEET], worldBounds);
@@ -233,7 +251,7 @@ function RenderCanvas() {
 
 function NetworkSendTick() {
     // Send client's data to network
-    if (Players[0]) SendPlayerData(Players[0]);
+    if (Players[myID]) SendPlayerData(Players[myID]);
 }
 
 function PlayPause() {
