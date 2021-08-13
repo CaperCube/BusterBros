@@ -155,7 +155,8 @@ function NetPlayer(ID) {
 
 module.exports.Utils = Utils;
 function Utils() {
-    this.BlockHere = function(sGame, p, xNew, yNew) {
+    // ToDo: this is broken somehow :(
+    this.BlockHere = function(util, sGame, p, xNew, yNew) {
         var temp = {
             x: xNew + 2,
             y: yNew + 4,
@@ -172,7 +173,25 @@ function Utils() {
                     h: sGame.gridCellSize
                 };
             }
-            if (wallTemp !== null && this.Collision(temp, wallTemp)) {
+            if (wallTemp !== null && util.Collision(temp, wallTemp)) {
+                console.log(`Gotcha!`);
+                return sGame.level[i];
+            }
+        }
+        return null;
+    }
+
+    this.GetTileByPosition = function (sGame, pos) {
+        for (var i = 0; i < sGame.level.length; i++) {
+            var tileTemp = null;
+            if (sGame.level[i] != null) {
+                tileTemp = {
+                    x: sGame.level[i].position.x,
+                    y: sGame.level[i].position.y,
+                };
+            }
+            if (tileTemp !== null && tileTemp.x == pos.x && tileTemp.y == pos.y) {
+                console.log(`Gotcha!`);
                 return sGame.level[i];
             }
         }

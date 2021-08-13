@@ -106,9 +106,20 @@ io.sockets.on('connection', function(socket) {
         if (serverGame && serverGame.serverTickRef) {
             // Remove tile from server level
             if (serverGame.level) {
-                let tileHere = netUtils.BlockHere(serverGame, {size: serverGame.gridCellSize}, data.position.x, data.position.y);
-                let tileIndex = serverGame.level.indexOf(tileHere);
-                serverGame.level.splice(tileIndex, 1);
+                //let tileHere = netUtils.BlockHere(netUtils, serverGame, { size: {x: serverGame.gridCellSize, y: serverGame.gridCellSize} }, data.position.x, data.position.y);
+                //let tileIndex = serverGame.level.indexOf(tileHere);
+                let tileIndex = serverGame.level.indexOf(netUtils.GetTileByPosition(serverGame, data.position));
+
+                //console.log(serverGame.level);
+                //console.log(data);
+                //console.log(tileIndex);
+
+                //serverGame.level.splice(tileIndex, 1);
+                //console.log(serverGame.level);
+                if (tileIndex) {
+                    console.log(`Tile removed at x: ${data.position.x}, y: ${data.position.y}`);
+                    serverGame.level[tileIndex] = null;
+                }
             }
 
             // Tell other players that a tile has been placed

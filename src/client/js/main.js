@@ -99,10 +99,29 @@ function CameraControl(c) {
     if (Buttons.o.pressed) c.position = {x: 0, y: 0};
 }
 
+function SaveLevel() {
+    //let k = 0;
+    let saveArray = [];
+    let worldWidth = Math.round(worldBounds.x / gridCellSize);
+    let worldHeight = Math.round(worldBounds.y / gridCellSize);
+
+    for (let i = 0; i < worldHeight; i++) {
+        saveArray[i] = [];
+        for (let j = 0; j < worldWidth; j++) {
+            // Check if there's a block in this spot
+            let thisTile = BlockHere({ size: {w: gridCellSize, h: gridCellSize} }, j*gridCellSize, i*gridCellSize);
+            if (thisTile) saveArray[i][j] = thisTile.tileIndex; // null if no block here
+            else saveArray[i][j] = null;
+        }
+    }
+
+    console.log(saveArray);
+}
+
 ////////////////////////////////////////////////////////
 // Init
 ////////////////////////////////////////////////////////
-function LoadLevel(bgToLoad, levelToLoad) {
+function LoadLevel(bgToLoad, levelToLoad) { // ToDo: store levels as 2D array
     // Load BG tiles
     BGTiles = [];
     for (var i = 0; i < bgToLoad.length; i++) {
@@ -171,8 +190,9 @@ Buttons.r.onPress = TempSpawnPlayer;
 
 socket.on(`joinConfirm`, function(data){
     // Load server's leve
-    if (data.level) {
+    if (data.level?.length > 1) {
         Walls = data.level;
+        //Walls = [];
         console.log(`Level loaded from server`);
     }
     else {
@@ -210,6 +230,9 @@ function RenderCanvas() {
     
     // Move camera
     if (cameraMove) CameraControl(camera);
+
+    // Save level controlls
+    Buttons.m.onPress = () => {SaveLevel()};
 
     // Draw Walls
     for (var i = 0; i < Walls.length; i++) {

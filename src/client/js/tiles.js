@@ -28,7 +28,7 @@ function PreloadImages(urls, allImagesLoadedCallback) {
     urls.forEach(function(url) {
         PreloadImage(url, function() {
             loadedCounter++;
-            console.log('Number of loaded images: ' + loadedCounter);
+            //console.log('Number of loaded images: ' + loadedCounter);
             if(loadedCounter == toBeLoadedNumber) {
                 allImagesLoadedCallback();
             }

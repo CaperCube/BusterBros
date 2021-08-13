@@ -298,8 +298,8 @@ function PlayerHere(p, xNew, yNew) {
         w: p.size.w - 4,
         h: p.size.h - 4
     };
-    ctx.strokeStyle = "white";
-    ctx.strokeRect(temp.x + camera.position.x, temp.y + camera.position.y, temp.w, temp.h);
+    //ctx.strokeStyle = "white";
+    //ctx.strokeRect(temp.x + camera.position.x, temp.y + camera.position.y, temp.w, temp.h);
     for (var i in Players) {
         var tempPlayer = null;
         if (Players[i] != null && Players[i] != p) {

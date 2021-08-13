@@ -248,7 +248,9 @@ function DrawUI(cctx, sheet, worldB) {
     }
 
     // Draw players items and such
-    tile = GetPosByIndex(sheet, gridCellSize, Players[myID].block);
+    let ti = Players[myID]?.block;
+    if (ti) tile = GetPosByIndex(sheet, gridCellSize, ti);
+    else tile = GetPosByIndex(sheet, gridCellSize, 0);
     cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (1 * gridCellSize), bottomUiY + (1 * gridCellSize), gridCellSize, gridCellSize);
 }
 
