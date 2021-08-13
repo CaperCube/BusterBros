@@ -106,6 +106,38 @@ socket.on(`serverRemoveTile`, function(data){
     Walls.splice(tileIndex, 1);
 });
 
+// Attack player
+function StompPlayer(p) {
+    socket.emit(`clientStompPlayer`, {
+        attackingPlayerID: myID,
+        otherPlayerID: p.id
+    });
+}
+
+// UnStomp self
+function UnStompSelf() {
+    socket.emit(`clientUnStompPlayer`, {
+        playerID: myID
+    });
+    
+    //console.log(`Tyring to unstomp self`);
+}
+
+// Server UnStomp
+socket.on(`serverUnStompPlayer`, function(data){
+    //Players[data.attackingPlayerID]; // the one who stomped
+    if (Players[data.playerID]) Players[data.playerID].stomped = false;
+
+    console.log(`Player ${data.playerID} has been unstomped`);
+});
+
+// Got Stomped
+socket.on(`serverStomped`, function(data){
+    //Players[data.attackingPlayerID]; // the one who stomped
+    Players[data.otherPlayerID].stomped = true;
+    // Play some fx here
+});
+
 /*
 socket.on(`clientMove`, function(data){
         // Get player with this socket.ID (if they exist)

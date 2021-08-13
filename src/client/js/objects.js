@@ -62,6 +62,8 @@ function Player(ix, iy, color, pid) {
     };
     
     this.color = color || playerColors[0];
+
+    this.stomped = false;
     
     // Movement vars
     this.moveSpeed = 0.4;

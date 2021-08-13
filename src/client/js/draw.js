@@ -81,6 +81,12 @@ function DrawPlayer(cctx, sheet, p) {
         else if (Math.sin(frameCount / 3) > 0 && Math.abs(p.velocity.x) > 0.1) framePos = sheet.height;
     }
 
+    // Stomped
+    if (p.stomped) framePos = sheet.height * 5;
+
+    // Dead
+    //if (p.dead) framePos = sheet.height * 4;
+
     // Draw the chosen frame
     cctx.drawImage(sheet, framePos, 0, sheet.height, sheet.height,
         Math.round(p.position.x + camera.position.x),

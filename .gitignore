@@ -8,6 +8,7 @@ node_modules/
 .env
 
 # photoshop or other working files
-.psd
-.act
-reference
+# .psd
+# .act
+reference/
+social/

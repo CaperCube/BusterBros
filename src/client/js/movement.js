@@ -107,16 +107,6 @@ function ControlCam() {
 }
 
 function ControlLoopPlatformer(p) {
-    // Move
-    if (GetInput(Controls.Player1.leftAxis1)) {
-        p.velocity.x -= p.moveSpeed;
-        p.dir = -1;
-    }
-    if (GetInput(Controls.Player1.rightAxis1)) {
-        p.velocity.x += p.moveSpeed;
-        p.dir = 1;
-    }
-    
     // Jump
     function jumpfunc() {
         if (p.usedJumps < p.totalJumps) {
@@ -124,8 +114,6 @@ function ControlLoopPlatformer(p) {
             p.velocity.y = -p.jumpSpeed;
         }
     }
-    
-    Controls.Player1.upAxis1.forEach(b => b.onPress = jumpfunc);
     
     // Shoot
     function shootfunc() {
@@ -139,14 +127,6 @@ function ControlLoopPlatformer(p) {
             p.usedAmmo++;
         }
     }
-    
-    //Controls.Player1.fire1.forEach(b => b.onPress = jumpfunc);
-    
-    // Parry
-    if (GetInput(Controls.Player1.downAxis1)) {
-        p.parry = true;
-    }
-    else p.parry = false;
 
     // Build
     let pX = ((gridCellSize + p.size.w/2) * p.dir);
@@ -161,30 +141,58 @@ function ControlLoopPlatformer(p) {
     };
 
     function buildfunc() {
-        let tileHere = BlockHere({size: p.size}, p.cursor.x, p.cursor.y);
-        if (tileHere == null) {
-            let newTile = new TileWall(
-                p.cursor.x,
-                p.cursor.y,
-                p.block
-            );
-            Walls.push(newTile);
+        // If cursor is in the bound of the world, allow placement
+        if (p.cursor.x >= 0 &&
+            p.cursor.x < worldBounds.x &&
+            p.cursor.y >= 0 &&
+            p.cursor.y < worldBounds.y) {
+            let tileHere = BlockHere({size: p.size}, p.cursor.x, p.cursor.y);
+            if (tileHere == null) {
+                let newTile = new TileWall(
+                    p.cursor.x,
+                    p.cursor.y,
+                    p.block
+                );
+                Walls.push(newTile);
 
-            //console.log(`Build at X: ${p.cursor.x} Y: ${p.cursor.y}`);
-            // Send message to server
-            SendNewTile(newTile);
-        }
-        else {
-            console.log(`Remove at X: ${p.cursor.x} Y: ${p.cursor.y}`);
-            let tileIndex = Walls.indexOf(tileHere);
-            Walls.splice(tileIndex, 1);
-            // Send message to server
+                //console.log(`Build at X: ${p.cursor.x} Y: ${p.cursor.y}`);
+                // Send message to server
+                SendNewTile(newTile);
+            }
+            else {
+                console.log(`Remove at X: ${p.cursor.x} Y: ${p.cursor.y}`);
+                let tileIndex = Walls.indexOf(tileHere);
+                Walls.splice(tileIndex, 1);
+                // Send message to server
 
-            SendRemovedTile(tileHere);
+                SendRemovedTile(tileHere);
+            }
         }
     }
 
+    // Move
+    if (!p.stomped) {
+        if (GetInput(Controls.Player1.leftAxis1)) {
+            p.velocity.x -= p.moveSpeed;
+            p.dir = -1;
+        }
+        if (GetInput(Controls.Player1.rightAxis1)) {
+            p.velocity.x += p.moveSpeed;
+            p.dir = 1;
+        }
+    }
+
+    Controls.Player1.upAxis1.forEach(b => b.onPress = jumpfunc);
     Controls.Player1.fire1.forEach(b => b.onPress = buildfunc);
+
+    //UnStomp
+    Controls.Player1.pause.forEach(b => b.onPress = () => {if (p.stomped) UnStompSelf()});
+
+    // Parry
+    if (GetInput(Controls.Player1.downAxis1)) {
+        p.parry = true;
+    }
+    else p.parry = false;
 
     // Change block
     Controls.Player1.invUp.forEach(b => b.onPress = () => {
@@ -202,6 +210,15 @@ function ControlLoopPlatformer(p) {
     DoGravity(p);
     //WorldWrapX(p);
     UpdatePickups(p);
+
+    // Check if stomping other player
+    let otherPlayer = PlayerHere(p, p.position.x + p.velocity.x, p.position.y + p.velocity.y);
+    if (otherPlayer) {
+        // Send network message to stomp if stomp success
+        let stompHeight = otherPlayer.position.y - otherPlayer.size.h * 0.66;
+        if (!otherPlayer.stomped && p.velocity.y > 0.5 && p.position.y < stompHeight) StompPlayer(otherPlayer);
+        //console.log(otherPlayer);
+    }
     
     // Apply friction
     p.velocity.x *= friction;
@@ -269,6 +286,32 @@ function BlockHere(p, xNew, yNew) {
         }
         if (wallTemp !== null && Collision(temp, wallTemp)) {
             return Walls[i];
+        }
+    }
+    return null;
+}
+
+function PlayerHere(p, xNew, yNew) {
+    var temp = {
+        x: xNew + 2,
+        y: yNew + 4,
+        w: p.size.w - 4,
+        h: p.size.h - 4
+    };
+    ctx.strokeStyle = "white";
+    ctx.strokeRect(temp.x + camera.position.x, temp.y + camera.position.y, temp.w, temp.h);
+    for (var i in Players) {
+        var tempPlayer = null;
+        if (Players[i] != null && Players[i] != p) {
+            tempPlayer = {
+                x: Players[i].position.x,
+                y: Players[i].position.y,
+                w: Players[i].size.w,
+                h: Players[i].size.h
+            };
+        }
+        if (tempPlayer !== null && Collision(temp, tempPlayer)) {
+            return Players[i];
         }
     }
     return null;

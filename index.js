@@ -130,10 +130,28 @@ io.sockets.on('connection', function(socket) {
                 if (targetPlayer != null){
 
                     // Try to stomp the other player
-                    serverGame.TryStomp(myPlayer, targetPlayer);
+                    //serverGame.TryStomp(myPlayer, targetPlayer);
+
+                    // Tell all players that a has been stomped
+                    for (var sID in SOCKET_LIST) {
+                        //if (sID != socket.ID)
+                        SOCKET_LIST[sID].emit('serverStomped', {
+                            attackingPlayerID: data.attackingPlayerID,
+                            otherPlayerID : data.otherPlayerID
+                        });
+                    }
                 }
 
             }
+        }
+    });
+
+    socket.on(`clientUnStompPlayer`, function(data){
+        // Tell all players that a has been stomped
+        for (var sID in SOCKET_LIST) {
+            SOCKET_LIST[sID].emit('serverUnStompPlayer', {
+                playerID: data.playerID
+            });
         }
     });
     
