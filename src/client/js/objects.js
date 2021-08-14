@@ -68,6 +68,7 @@ function Player(ix, iy, color, pid) {
     // Movement vars
     this.moveSpeed = 0.4;
     this.dir = 1;
+    this.look = 0;
     this.parry = false; // temporary
     
     this.jumpSpeed = 2.8;//3.2;

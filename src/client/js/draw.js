@@ -51,17 +51,6 @@ function DrawTile(cctx, tMap, tSize, idx, x, y) {
 function DrawPlayer(cctx, sheet, p) {
     // Draw player
     cctx.fillStyle = p.color;
-    /*
-    cctx.beginPath();
-    cctx.arc(
-        (p.position.x + p.size.w / 2) + camera.position.x,
-        (p.position.y + p.size.h / 2) + camera.position.y,
-        p.size.h / 2,
-        0, 2 * Math.PI,
-        false
-    );
-    cctx.fill();
-    */
     
     // Flip context when player is facing left
     if (p.dir < 0) {
@@ -94,17 +83,6 @@ function DrawPlayer(cctx, sheet, p) {
         gridCellSize,
         gridCellSize
     );
-    
-    // Draw gun
-    /*
-    cctx.fillStyle = "#555555";
-    ctx.fillRect(
-        (p.position.x + (p.dir * (gridCellSize * 0.5))) + camera.position.x,
-        (p.position.y + (p.size.h / 6)) + camera.position.y,
-        gridCellSize * 0.8,
-        gridCellSize/3
-    );
-    */
     
     // Reset context
     cctx.setTransform(1,0,0,1,0,0);
@@ -248,10 +226,33 @@ function DrawUI(cctx, sheet, worldB) {
     }
 
     // Draw players items and such
-    let ti = Players[myID]?.block;
-    if (ti) tile = GetPosByIndex(sheet, gridCellSize, ti);
-    else tile = GetPosByIndex(sheet, gridCellSize, 0);
-    cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (1 * gridCellSize), bottomUiY + (1 * gridCellSize), gridCellSize, gridCellSize);
+    for (var i = 0; i < 46; i++) {
+        let ti = Players[myID]?.block;
+        let idx = ti + i;
+        let maxTiles = (sheet.width * sheet.height) / gridCellSize;
+        if (idx > maxTiles) idx -= maxTiles;
+
+        if (idx) tile = GetPosByIndex(sheet, gridCellSize, idx);
+        else tile = GetPosByIndex(sheet, gridCellSize, 0);
+        let ty = 0;
+        if (i >= 23) ty = 1;
+        cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (1 + (i % 23)) * gridCellSize, bottomUiY + ((1 + ty) * gridCellSize), gridCellSize, gridCellSize);
+
+        // text
+        if (i > 0 && i < 11) {
+            cctx.fillStyle = `black`;
+            cctx.font = 'bold 10px sans-serif';
+            cctx.fillText(`${i%10}`, (i + 1) * gridCellSize + 5, bottomUiY + (1 * gridCellSize) - 3);
+        }
+    }
+
+    // Selected Tile
+    cctx.strokeStyle = '#00FF00';
+    cctx.lineWidth = 1;
+    cctx.strokeRect((1 * gridCellSize) + 0.5, bottomUiY + (1 * gridCellSize) + 0.5, gridCellSize - 1, gridCellSize - 1);
+    cctx.strokeStyle = '#FFFFFF88';
+    cctx.strokeRect((1 * gridCellSize) - 0.5, bottomUiY + (1 * gridCellSize) - 0.5, gridCellSize + 1, gridCellSize + 1);
+    
 }
 
 //

@@ -179,15 +179,15 @@ var Controls = {
         downAxis1: [Buttons.down, Buttons.s],
         leftAxis1: [Buttons.left, Buttons.a],
         rightAxis1: [Buttons.right, Buttons.d],
-        jump: [Buttons.space],
+        jump: [Buttons.x, Buttons.period],
         crouch: [Buttons.control],
-        run: [Buttons.shift],
-        //fire1: [Buttons.lmb],
-        //fire2: [Buttons.rmb],
-        fire1: [Buttons.c, Buttons.slash],
+        run: [Buttons.z, Buttons.slash],
+        fire1: [Buttons.c, Buttons.comma],
         reload: [Buttons.r],
-        invUp: [Buttons.e],
-        invDown: [Buttons.q],
+        //invUp: [Buttons.e],
+        //invDown: [Buttons.q],
+        invUp: [Buttons.equals],
+        invDown: [Buttons.minus],
         pause: [Buttons.p]
     }
 }

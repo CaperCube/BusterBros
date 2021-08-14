@@ -131,9 +131,13 @@ function ControlLoopPlatformer(p) {
     // Build
     let pX = ((gridCellSize + p.size.w/2) * p.dir);
     let pY = 0;
-    if (p.parry) {
+    if (p.look < 0) {
         pX = (gridCellSize/8 + p.size.w/8) * p.dir;
         pY = (gridCellSize + p.size.h/3);
+    }
+    else if (p.look > 0) {
+        pX = 0;
+        pY = (gridCellSize) * -1.5;
     }
     p.cursor = {
         x: Math.round((p.position.x + camera.position.x + pX) / gridCellSize) * gridCellSize,
@@ -182,7 +186,8 @@ function ControlLoopPlatformer(p) {
         }
     }
 
-    Controls.Player1.upAxis1.forEach(b => b.onPress = jumpfunc);
+    //Controls.Player1.upAxis1.forEach(b => b.onPress = jumpfunc);
+    Controls.Player1.jump.forEach(b => b.onPress = jumpfunc);
     Controls.Player1.fire1.forEach(b => b.onPress = buildfunc);
 
     //UnStomp
@@ -191,19 +196,37 @@ function ControlLoopPlatformer(p) {
     // Parry
     if (GetInput(Controls.Player1.downAxis1)) {
         p.parry = true;
+        p.look = -1;
     }
-    else p.parry = false;
+    else if (GetInput(Controls.Player1.upAxis1)) {
+        p.parry = false;
+        p.look = 1;
+    }
+    else {
+        p.parry = false;
+        p.look = 0;
+    }
 
     // Change block
-    Controls.Player1.invUp.forEach(b => b.onPress = () => {
-        p.block++;
-        if (p.block > 1023) p.block = 0;
-    });
-
-    Controls.Player1.invDown.forEach(b => b.onPress = () => {
-        p.block--;
+    function NumberPickTile(num) {
+        p.block+=num;
         if (p.block < 0) p.block = 1023;
-    });
+        if (p.block > 1023) p.block = 0;
+    }
+    
+    Controls.Player1.invUp.forEach(b => b.onPress = () => { NumberPickTile(1) });
+    Controls.Player1.invDown.forEach(b => b.onPress = () => { NumberPickTile(-1) });
+
+    Buttons.one.onPress = () => { NumberPickTile(1) };
+    Buttons.two.onPress = () => { NumberPickTile(2) };
+    Buttons.three.onPress = () => { NumberPickTile(3) };
+    Buttons.four.onPress = () => { NumberPickTile(4) };
+    Buttons.five.onPress = () => { NumberPickTile(5) };
+    Buttons.six.onPress = () => { NumberPickTile(6) };
+    Buttons.seven.onPress = () => { NumberPickTile(7) };
+    Buttons.eight.onPress = () => { NumberPickTile(8) };
+    Buttons.nine.onPress = () => { NumberPickTile(9) };
+    Buttons.zero.onPress = () => { NumberPickTile(10) };
 
     // Update position
     UpdatePositionX(p);
