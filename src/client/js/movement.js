@@ -60,14 +60,21 @@ function UpdatePickups(p) {
 }
 
 function DoGravity(p) {
+    function Bounce() {
+        if (p.velocity.y > 0) {
+            if (p.velocity.y > 1) TriggerNetworkSound('land');
+            p.usedJumps = 0;
+        }
+        p.velocity.y *= -bounce;
+    }
+
     // Check y
     if (PlaceFree(p, p.position.x, p.position.y + p.velocity.y)) {
         p.position.y += p.velocity.y;
     }
     else {
         // Bounce
-        if (p.velocity.y > 0) p.usedJumps = 0;
-        p.velocity.y *= -bounce;
+        Bounce();
     }
     // world bounds
     if ((p.position.y + (p.size.h/2) + p.velocity.y) < 0) {
@@ -77,8 +84,7 @@ function DoGravity(p) {
         }
         else {
             // Bounce
-            if (p.velocity.y > 0) p.usedJumps = 0;
-            p.velocity.y *= -bounce;
+            Bounce();
         }
     }
     else if ((p.position.y + (p.size.h/2) + p.velocity.y) >= worldBounds.y) {
@@ -88,8 +94,7 @@ function DoGravity(p) {
         }
         else {
             // Bounce
-            if (p.velocity.y > 0) p.usedJumps = 0;
-            p.velocity.y *= -bounce;
+            Bounce();
         }
     }
     // Do accelleration
@@ -113,6 +118,8 @@ function ControlLoopPlatformer(p) {
             p.usedJumps += 1;
             p.velocity.y = -p.jumpSpeed;
         }
+
+        TriggerNetworkSound('jump');
     }
     
     // Shoot
@@ -128,7 +135,7 @@ function ControlLoopPlatformer(p) {
         }
     }
 
-    // Build
+    //#region Place cursor 
     let pX = ((gridCellSize + p.size.w/2) * p.dir);
     let pY = 0;
     if (p.look < 0) {
@@ -137,31 +144,41 @@ function ControlLoopPlatformer(p) {
     }
     else if (p.look > 0) {
         pX = 0;
-        pY = (gridCellSize) * -1.5;
+        if (p.velocity.y > 0) pY = ((gridCellSize) * -1.5) + p.velocity.y;
+        else pY = ((gridCellSize) * -1.5);
     }
     p.cursor = {
         x: Math.round((p.position.x + camera.position.x + pX) / gridCellSize) * gridCellSize,
         y: Math.round((p.position.y + camera.position.y + pY) / gridCellSize) * gridCellSize
     };
+    if (p.cursor.y > worldBounds.y) p.cursor.y = 0;
+    else if (p.cursor.y < 0) p.cursor.y = worldBounds.y - gridCellSize;
+    if (p.cursor.x > worldBounds.x) p.cursor.x = 0;
+    else if (p.cursor.x < 0) p.cursor.x = worldBounds.x - gridCellSize;
+    //#endregion
 
+    // Build
     function buildfunc() {
         // If cursor is in the bound of the world, allow placement
+        let playerHere = PlayerHere({size: {w: (gridCellSize * 1.1) + 2, h: (gridCellSize * 1.1) + 2}}, p.cursor.x-2, p.cursor.y-4);
         if (p.cursor.x >= 0 &&
             p.cursor.x < worldBounds.x &&
             p.cursor.y >= 0 &&
-            p.cursor.y < worldBounds.y && !p.stomped) {
+            p.cursor.y < worldBounds.y && !p.stomped && !playerHere) {
             let tileHere = BlockHere({size: p.size}, p.cursor.x, p.cursor.y);
             if (tileHere == null) {
                 let newTile = new TileWall(
                     p.cursor.x,
                     p.cursor.y,
-                    p.block
+                    p.block,
+                    myID
                 );
                 Walls.push(newTile);
 
                 //console.log(`Build at X: ${p.cursor.x} Y: ${p.cursor.y}`);
                 // Send message to server
                 SendNewTile(newTile);
+                BUILD_SFX.Play();
             }
             else {
                 console.log(`Remove at X: ${p.cursor.x} Y: ${p.cursor.y}`);
@@ -170,6 +187,7 @@ function ControlLoopPlatformer(p) {
                 // Send message to server
 
                 SendRemovedTile(tileHere);
+                REMOVE_SFX.Play();
             }
         }
     }
@@ -187,7 +205,7 @@ function ControlLoopPlatformer(p) {
         }
 
         // Check if stomping other player
-        let otherPlayer = PlayerHere(p, p.position.x + p.velocity.x, p.position.y + p.velocity.y);
+        let otherPlayer = PlayerHere(p, p.position.x + p.velocity.x, p.position.y + p.velocity.y - 4);
         if (otherPlayer) {
             // Send network message to stomp if stomp success
             let stompHeight = otherPlayer.position.y - otherPlayer.size.h * 0.66;
@@ -217,6 +235,7 @@ function ControlLoopPlatformer(p) {
         }
     }
 
+    //#region Assign controls
     // Jump, Action
     Controls.Player1.jump.forEach(b => b.onPress = jumpfunc);
     Controls.Player1.fire1.forEach(b => b.onPress = buildfunc);
@@ -244,6 +263,7 @@ function ControlLoopPlatformer(p) {
     Buttons.eight.onPress = () => { NumberPickTile(8) };
     Buttons.nine.onPress = () => { NumberPickTile(9) };
     Buttons.zero.onPress = () => { NumberPickTile(10) };
+    //#endregion
 
     // Update position
     UpdatePositionX(p);

@@ -7,6 +7,7 @@ let loadedImages = [];
 // Constants
 ///////////////////////////////////////
 const SRC_PATH = "src/";
+const SOUND_PATH = "src/sound/";
 
 // Images
 const imageSRC = [
@@ -35,32 +36,33 @@ const uiTiles = {
 
 // Sounds
 const soundSRC = [
-    `${SRC_PATH}Stomp1.wav`,
-    `${SRC_PATH}Die1.wav`,
-    `${SRC_PATH}Pop1.wav`,
-    //`${SRC_PATH}Jump1.wav`
-
-    //`${SRC_PATH}Step_01.wav`,
-    //`${SRC_PATH}Step_02.wav`,
-    //`${SRC_PATH}Step_03.wav`,
-    //`${SRC_PATH}Step_04.wav`
+    `${SOUND_PATH}Stomp1.wav`,
+    `${SOUND_PATH}Die1.wav`,
+    `${SOUND_PATH}Pop1.wav`,
+    `${SOUND_PATH}Jump1.wav`,
+    `${SOUND_PATH}Land1.wav`,
+    `${SOUND_PATH}Build1.wav`,
+    `${SOUND_PATH}Remove1.wav`,
+    `${SOUND_PATH}BusterBros_Music.wav`
 ];
 
 const STOMP_SOUND = 0;
 const DIE_SOUND = 1;
 const POP_SOUND = 2;
-//const STEP1_SOUND = 3;
-//const STEP2_SOUND = 4;
-//const STEP3_SOUND = 5;
-//const STEP4_SOUND = 6;
+const JUMP_SOUND = 3;
+const LAND_SOUND = 4;
+const BUILD_SOUND = 5;
+const REMOVE_SOUND = 6;
+const MUSIC_SOUND = 7;
 
 const STOMP_SFX = new Sound(soundSRC[STOMP_SOUND]);
 const DIE_SFX = new Sound(soundSRC[DIE_SOUND]);
 const POP_SFX = new Sound(soundSRC[POP_SOUND]);
-//const STEP1_SFX = new Sound(soundSRC[STEP1_SOUND]);
-//const STEP2_SFX = new Sound(soundSRC[STEP2_SOUND]);
-//const STEP3_SFX = new Sound(soundSRC[STEP3_SOUND]);
-//const STEP4_SFX = new Sound(soundSRC[STEP4_SOUND]);
+const JUMP_SFX = new Sound(soundSRC[JUMP_SOUND]);
+const LAND_SFX = new Sound(soundSRC[LAND_SOUND]);
+const BUILD_SFX = new Sound(soundSRC[BUILD_SOUND]);
+const REMOVE_SFX = new Sound(soundSRC[REMOVE_SOUND]);
+const MUSIC_SFX = new Sound(soundSRC[MUSIC_SOUND], true, 0.25);
 
 ///////////////////////////////////////
 // Load functions
@@ -87,19 +89,28 @@ function PreloadImages(urls, allImagesLoadedCallback) {
 }
 
 // Sound class
-function Sound(src) {
+function Sound(src, loop = false, volume = 1) {
     // Thanks to: https://www.w3schools.com/graphics/game_sound.asp
+    this.loop = false || loop;
     this.sound = document.createElement("audio");
     this.sound.src = src;
     this.sound.setAttribute("preload", "auto");
     this.sound.setAttribute("controls", "none");
     this.sound.style.display = "none";
+    this.sound.volume = volume;
     document.body.appendChild(this.sound);
 
     this.Play = function(){
+        this.sound.currentTime = 0;
         this.sound.play();
     }
     this.Stop = function(){
         this.sound.pause();
     }
+    this.sound.addEventListener(`ended`, () => {
+        if (this.loop) {
+            this.Play();
+            this.sound.setAttribute("loop", "auto");
+        }
+    });
 }

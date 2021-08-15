@@ -101,12 +101,14 @@ socket.on(`serverAddTile`, function(data){
         data.tileIndex
     );
     Walls.push(newTile);
+    BUILD_SFX.Play();
 });
 
 socket.on(`serverRemoveTile`, function(data){
     let tileHere = BlockHere({size: Players[myID].size}, data.position.x, data.position.y);
     let tileIndex = Walls.indexOf(tileHere);
     Walls.splice(tileIndex, 1);
+    REMOVE_SFX.Play();
 });
 
 // Attack player
@@ -166,3 +168,23 @@ socket.on(`clientMove`, function(data){
         }
     });
 */
+
+//#region Network sounds
+function TriggerNetworkSound(type) {
+    socket.emit(`clientTriggerSound`, type);
+}
+
+socket.on(`serverTriggerSound`, function(data){
+    switch (data) {
+        case `jump`:
+            JUMP_SFX.Play();
+            break;
+        case `land`:
+            LAND_SFX.Play();
+            break;
+        default:
+            //
+            break;
+    }
+});
+//#endregion

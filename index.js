@@ -165,6 +165,13 @@ io.sockets.on('connection', function(socket) {
             });
         }
     });
+
+    socket.on(`clientTriggerSound`, function(data){
+        // Tell all clients to play the sound
+        for (var sID in SOCKET_LIST) {
+            SOCKET_LIST[sID].emit('serverTriggerSound', data);
+        }
+    });
     
 
     // Create listener for this user disconnecting

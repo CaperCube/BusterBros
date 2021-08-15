@@ -20,13 +20,14 @@ function Wall(iw, ih, ix, iy, ti){//color) {
     this.tIndex = ti || 0;
 }
 
-function TileWall(ix, iy, ti){
+function TileWall(ix, iy, ti, owner = 0){
     this.position = {
         x: ix || 0,
         y: iy || 0
     };
     
     this.tileIndex = ti || 0;
+    this.ownerId = owner || 0;
 }
 
 function Spawn(ix, iy, color, pId) {
@@ -64,6 +65,7 @@ function Player(ix, iy, color, pid) {
     
     this.color = color || playerColors[0];
 
+    this.lives = 10;
     this.stomped = false;
     
     // Movement vars
