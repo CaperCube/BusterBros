@@ -69,7 +69,9 @@ function DrawPlayer(cctx, sheet, p) {
         // if no tile below player, show "jumping" frame
         if (PlaceFree(p, p.position.x, p.position.y + gridCellSize/2) && (p.position.y + (p.size.h/2) + p.velocity.y) < worldBounds.y) framePos = sheet.height * 2;
         // else if player is moving laterally, alternate "walking" frames
-        else if (Math.sin(frameCount / 3) > 0 && Math.abs(p.velocity.x) > 0.1) framePos = sheet.height;
+        else if (Math.sin(frameCount / 3) > 0 && Math.abs(p.velocity.x) > 0.1) {
+            framePos = sheet.height;
+        }
     }
 
     // Stomped

@@ -111,7 +111,7 @@ socket.on(`serverRemoveTile`, function(data){
 
 // Attack player
 function StompPlayer(p) {
-    // Senda network message
+    // Send a network message
     socket.emit(`clientStompPlayer`, {
         attackingPlayerID: myID,
         otherPlayerID: p.id
@@ -120,6 +120,7 @@ function StompPlayer(p) {
 
 // UnStomp self
 function UnStompSelf() {
+    // Send network message
     socket.emit(`clientUnStompPlayer`, {
         playerID: myID
     });
@@ -129,6 +130,8 @@ function UnStompSelf() {
 
 // Server UnStomp
 socket.on(`serverUnStompPlayer`, function(data){
+    // Play sound
+    POP_SFX.Play();
     //Players[data.attackingPlayerID]; // the one who stomped
     if (Players[data.playerID]) Players[data.playerID].stomped = false;
 
@@ -143,6 +146,8 @@ socket.on(`serverStomped`, function(data){
         // Stomp player
         p.stomped = true;
         // Play some fx here
+        STOMP_SFX.Play();
+        DIE_SFX.Play();
         StompFX({x: p.position.x, y: p.position.y - 1});
     }
 });
