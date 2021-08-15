@@ -1,13 +1,16 @@
 let loadedImages = [];
+const SRC_PATH = "src/";
 const imageSRC = [
-    "src/busterbros_tiles.png",
-    //"src/Classic.png"
-    "src/Char_Blue.png",
-    "src/Char_Red.png"
+    `${SRC_PATH}busterbros_tiles.png`,
+    //`${SRC_PATH}Classic.png1
+    `${SRC_PATH}Char_Blue.png`,
+    `${SRC_PATH}Char_Red.png`,
+    `${SRC_PATH}Stomp_fx.png`
 ];
 const MAIN_SHEET = 0;
 const PLAYER_SPRITE = 1;
 const PLAYER_OTHER_SPRITE = 2;
+const STOMP_SHEET = 3;
 
 const uiTiles = {
     tl: 923,

@@ -37,6 +37,9 @@ socket.on(`ServerPacket`, function(data){
     //console.log(data);
     //console.log(`Client Players: ${Players.length}\nNetwork Players: ${data.players.length}`);
 
+    //
+    // ToDo: loop through client players and remove ones that aren't present in ServerPacket
+    //
     //for (var nPlayer in data) {
     for (var i = 0; i < data.players.length; i++) {
     //for (var p in data.players) {
@@ -108,6 +111,7 @@ socket.on(`serverRemoveTile`, function(data){
 
 // Attack player
 function StompPlayer(p) {
+    // Senda network message
     socket.emit(`clientStompPlayer`, {
         attackingPlayerID: myID,
         otherPlayerID: p.id
@@ -134,8 +138,13 @@ socket.on(`serverUnStompPlayer`, function(data){
 // Got Stomped
 socket.on(`serverStomped`, function(data){
     //Players[data.attackingPlayerID]; // the one who stomped
-    Players[data.otherPlayerID].stomped = true;
-    // Play some fx here
+    let p = Players[data.otherPlayerID];
+    if (p) {
+        // Stomp player
+        p.stomped = true;
+        // Play some fx here
+        StompFX({x: p.position.x, y: p.position.y - 1});
+    }
 });
 
 /*

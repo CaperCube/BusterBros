@@ -2,6 +2,7 @@
 ////////////////////////////////////////////////////////
 // Draw Functions
 ////////////////////////////////////////////////////////
+// !! not used !! //
 function DrawWall(cctx, o) {
     cctx.fillStyle = o.color;
     cctx.fillRect(
@@ -28,7 +29,8 @@ function GetPosByIndex(area, tSize, indx) {
 
     return {
         x: (indx * tSize) % wc,
-        y: Math.floor((indx * tSize) / hc) * tSize
+        //y: Math.floor((indx * tSize) / hc) * tSize
+        y: Math.floor((indx * tSize) / wc) * tSize
     };
 }
 

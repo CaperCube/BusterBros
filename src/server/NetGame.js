@@ -174,7 +174,6 @@ function Utils() {
                 };
             }
             if (wallTemp !== null && util.Collision(temp, wallTemp)) {
-                console.log(`Gotcha!`);
                 return sGame.level[i];
             }
         }
@@ -191,7 +190,6 @@ function Utils() {
                 };
             }
             if (tileTemp !== null && tileTemp.x == pos.x && tileTemp.y == pos.y) {
-                console.log(`Gotcha!`);
                 return sGame.level[i];
             }
         }

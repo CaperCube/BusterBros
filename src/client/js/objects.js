@@ -3,6 +3,7 @@ var gridCellSize = 16;
 ////////////////////////////////////////////////////////
 // Objects
 ////////////////////////////////////////////////////////
+// !! not used !! //
 function Wall(iw, ih, ix, iy, ti){//color) {
     this.size = {
         w: iw || gridCellSize,
@@ -91,6 +92,7 @@ function Player(ix, iy, color, pid) {
     this.damage = 5;
 }
 
+// !! not used !! //
 function networkPlayer(ix, iy, color) {
     this.id = 0;
     this.size = {

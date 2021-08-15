@@ -35,6 +35,7 @@ let bgLayerComp;
 let myID = 0;
 
 let gravity = 0.08;//0.1;
+let terminalVel = 15;
 let friction = 0.8;
 let bounce = 0.2;
 
@@ -175,7 +176,7 @@ function LoadLevel(bgToLoad, levelToLoad) { // ToDo: store levels as 2D array
 
 function Init() {
     // Setup level
-    LoadLevel(tileBG2, tileMapLevel2);
+    LoadLevel(tileBG2, tileMapLevel5);
     
     // Start rendering
     PlayPause();
@@ -238,18 +239,6 @@ function RenderCanvas() {
     for (var i = 0; i < Walls.length; i++) {
         if (Walls[i] != null && Walls[i] != undefined) DrawTile(ctx, loadedImages[MAIN_SHEET], gridCellSize, Walls[i].tileIndex, Walls[i].position.x, Walls[i].position.y);
     }
-    // Draw Spawns
-    /*
-    for (var i = 0; i < Spawns.length; i++) {
-        DrawWall(ctx, Spawns[i]);
-    }
-    */
-    /*
-    // Draw DeathZones
-    for (var i = 0; i < DeathZones.length; i++) {
-        DrawWall(ctx, DeathZones[i]);
-    }
-    */
     // Draw Bullets
     for (var i = 0; i < Bullets.length; i++) {
         if (!isPaused) UpdateBullet(Bullets[i], i);
@@ -265,6 +254,9 @@ function RenderCanvas() {
             else DrawPlayer(ctx, loadedImages[PLAYER_OTHER_SPRITE], Players[p]);
         }
     }
+
+    //FX layer
+    DrawFX(ctx);
     
     // UI layer
     DrawUI(ctx, loadedImages[MAIN_SHEET], worldBounds);

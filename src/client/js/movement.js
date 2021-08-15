@@ -109,7 +109,7 @@ function ControlCam() {
 function ControlLoopPlatformer(p) {
     // Jump
     function jumpfunc() {
-        if (p.usedJumps < p.totalJumps) {
+        if (p.usedJumps < p.totalJumps && !p.stomped) {
             p.usedJumps += 1;
             p.velocity.y = -p.jumpSpeed;
         }
@@ -149,7 +149,7 @@ function ControlLoopPlatformer(p) {
         if (p.cursor.x >= 0 &&
             p.cursor.x < worldBounds.x &&
             p.cursor.y >= 0 &&
-            p.cursor.y < worldBounds.y) {
+            p.cursor.y < worldBounds.y && !p.stomped) {
             let tileHere = BlockHere({size: p.size}, p.cursor.x, p.cursor.y);
             if (tileHere == null) {
                 let newTile = new TileWall(
@@ -174,38 +174,55 @@ function ControlLoopPlatformer(p) {
         }
     }
 
-    // Move
+    // Move, Stomp, Parry, Look
     if (!p.stomped) {
+        // Move
         if (GetInput(Controls.Player1.leftAxis1)) {
-            p.velocity.x -= p.moveSpeed;
+            if (p.look >= 0) p.velocity.x -= p.moveSpeed;
             p.dir = -1;
         }
         if (GetInput(Controls.Player1.rightAxis1)) {
-            p.velocity.x += p.moveSpeed;
+            if (p.look >= 0) p.velocity.x += p.moveSpeed;
             p.dir = 1;
+        }
+
+        // Check if stomping other player
+        let otherPlayer = PlayerHere(p, p.position.x + p.velocity.x, p.position.y + p.velocity.y);
+        if (otherPlayer) {
+            // Send network message to stomp if stomp success
+            let stompHeight = otherPlayer.position.y - otherPlayer.size.h * 0.66;
+            if (!otherPlayer.stomped && p.velocity.y > 0.5 && p.position.y < stompHeight) {
+                // Bounce my player
+                p.usedJumps = 0;
+                p.velocity.y *= -(bounce*4);
+                StompPlayer(otherPlayer);
+            }
+            //console.log(otherPlayer);
+        }
+
+        // Parry, Look down
+        if (GetInput(Controls.Player1.downAxis1)) {
+            p.parry = true;
+            p.look = -1;
+        }
+        // Look up
+        else if (GetInput(Controls.Player1.upAxis1)) {
+            p.parry = false;
+            p.look = 1;
+        }
+        // default
+        else {
+            p.parry = false;
+            p.look = 0;
         }
     }
 
-    //Controls.Player1.upAxis1.forEach(b => b.onPress = jumpfunc);
+    // Jump, Action
     Controls.Player1.jump.forEach(b => b.onPress = jumpfunc);
     Controls.Player1.fire1.forEach(b => b.onPress = buildfunc);
 
     //UnStomp
     Controls.Player1.pause.forEach(b => b.onPress = () => {if (p.stomped) UnStompSelf()});
-
-    // Parry
-    if (GetInput(Controls.Player1.downAxis1)) {
-        p.parry = true;
-        p.look = -1;
-    }
-    else if (GetInput(Controls.Player1.upAxis1)) {
-        p.parry = false;
-        p.look = 1;
-    }
-    else {
-        p.parry = false;
-        p.look = 0;
-    }
 
     // Change block
     function NumberPickTile(num) {
@@ -233,18 +250,13 @@ function ControlLoopPlatformer(p) {
     DoGravity(p);
     //WorldWrapX(p);
     UpdatePickups(p);
-
-    // Check if stomping other player
-    let otherPlayer = PlayerHere(p, p.position.x + p.velocity.x, p.position.y + p.velocity.y);
-    if (otherPlayer) {
-        // Send network message to stomp if stomp success
-        let stompHeight = otherPlayer.position.y - otherPlayer.size.h * 0.66;
-        if (!otherPlayer.stomped && p.velocity.y > 0.5 && p.position.y < stompHeight) StompPlayer(otherPlayer);
-        //console.log(otherPlayer);
-    }
     
     // Apply friction
     p.velocity.x *= friction;
+
+    // Apply terminal velocity
+    if (p.velocity.y > terminalVel) p.velocity.y = terminalVel;
+    else if (p.velocity.y < -terminalVel) p.velocity.y = -terminalVel;
     
     //ControllCam();
 }

@@ -117,7 +117,7 @@ io.sockets.on('connection', function(socket) {
                 //serverGame.level.splice(tileIndex, 1);
                 //console.log(serverGame.level);
                 if (tileIndex) {
-                    console.log(`Tile removed at x: ${data.position.x}, y: ${data.position.y}`);
+                    //console.log(`Tile removed at x: ${data.position.x}, y: ${data.position.y}`);
                     serverGame.level[tileIndex] = null;
                 }
             }
