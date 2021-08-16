@@ -133,9 +133,12 @@ function UnStompSelf() {
 // Server UnStomp
 socket.on(`serverUnStompPlayer`, function(data){
     // Play sound
-    POP_SFX.Play();
+    //POP_SFX.Play();
     //Players[data.attackingPlayerID]; // the one who stomped
-    if (Players[data.playerID]) Players[data.playerID].stomped = false;
+    //let thisPlayer = Players[data.playerID];
+    //if (thisPlayer) thisPlayer.stomped = false;
+
+    RespawnPlayer(Players[data.playerID]);
 
     console.log(`Player ${data.playerID} has been unstomped`);
 });
@@ -144,14 +147,8 @@ socket.on(`serverUnStompPlayer`, function(data){
 socket.on(`serverStomped`, function(data){
     //Players[data.attackingPlayerID]; // the one who stomped
     let p = Players[data.otherPlayerID];
-    if (p) {
-        // Stomp player
-        p.stomped = true;
-        // Play some fx here
-        STOMP_SFX.Play();
-        DIE_SFX.Play();
-        StompFX({x: p.position.x, y: p.position.y - 1});
-    }
+    // Stomp player
+    GetStomped(p);
 });
 
 /*

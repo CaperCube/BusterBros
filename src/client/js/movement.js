@@ -138,14 +138,17 @@ function ControlLoopPlatformer(p) {
     //#region Place cursor 
     let pX = ((gridCellSize + p.size.w/2) * p.dir);
     let pY = 0;
+    // Looking down
     if (p.look < 0) {
         pX = (gridCellSize/8 + p.size.w/8) * p.dir;
         pY = (gridCellSize + p.size.h/3);
+        if (p.velocity.y > 0) pY = (gridCellSize + p.size.h/3) + p.velocity.y;
+        else pY = (gridCellSize + p.size.h/3);
     }
+    // Looking up
     else if (p.look > 0) {
         pX = 0;
-        if (p.velocity.y > 0) pY = ((gridCellSize) * -1.5) + p.velocity.y;
-        else pY = ((gridCellSize) * -1.5);
+        pY = ((gridCellSize) * -1.5);
     }
     p.cursor = {
         x: Math.round((p.position.x + camera.position.x + pX) / gridCellSize) * gridCellSize,
@@ -160,25 +163,27 @@ function ControlLoopPlatformer(p) {
     // Build
     function buildfunc() {
         // If cursor is in the bound of the world, allow placement
-        let playerHere = PlayerHere({size: {w: (gridCellSize * 1.1) + 2, h: (gridCellSize * 1.1) + 2}}, p.cursor.x-2, p.cursor.y-4);
         if (p.cursor.x >= 0 &&
             p.cursor.x < worldBounds.x &&
             p.cursor.y >= 0 &&
-            p.cursor.y < worldBounds.y && !p.stomped && !playerHere) {
+            p.cursor.y < worldBounds.y && !p.stomped) {
             let tileHere = BlockHere({size: p.size}, p.cursor.x, p.cursor.y);
             if (tileHere == null) {
-                let newTile = new TileWall(
-                    p.cursor.x,
-                    p.cursor.y,
-                    p.block,
-                    myID
-                );
-                Walls.push(newTile);
+                let playerHere = PlayerHere({size: {w: (gridCellSize * 1.1) + 2, h: (gridCellSize * 1.1) + 2}}, p.cursor.x-2, p.cursor.y-4);
+                if (!playerHere) {
+                    let newTile = new TileWall(
+                        p.cursor.x,
+                        p.cursor.y,
+                        p.block,
+                        myID
+                    );
+                    Walls.push(newTile);
 
-                //console.log(`Build at X: ${p.cursor.x} Y: ${p.cursor.y}`);
-                // Send message to server
-                SendNewTile(newTile);
-                BUILD_SFX.Play();
+                    //console.log(`Build at X: ${p.cursor.x} Y: ${p.cursor.y}`);
+                    // Send message to server
+                    SendNewTile(newTile);
+                    BUILD_SFX.Play();
+                }
             }
             else {
                 console.log(`Remove at X: ${p.cursor.x} Y: ${p.cursor.y}`);
@@ -279,6 +284,49 @@ function ControlLoopPlatformer(p) {
     else if (p.velocity.y < -terminalVel) p.velocity.y = -terminalVel;
     
     //ControllCam();
+}
+
+function GetStomped(p) {
+    if (p && !p.stomped) {
+        // Stomp player
+        p.stomped = true;
+        //p.lives--;
+
+        // Play some
+        STOMP_SFX.Play();
+        DIE_SFX.Play();
+
+        // FX
+        StompFX({x: p.position.x, y: p.position.y - 1});
+    }
+}
+
+function RespawnPlayer(p) {
+    // Don't allow respawn if player is out of lives
+    if (p) {
+        //Players[data.attackingPlayerID]; // the one who stomped
+        //let thisPlayer = Players[p];
+        p.stomped = false;
+
+        // Reset velocity
+        p.velocity = { x: 0, y: 0 };
+
+        // Try respawn
+        // choose a random location
+        let location = { x: Math.random() * worldBounds.x, y: Math.random() * (worldBounds.y - gridCellSize) };
+        // while location is colliding with a tile, pick new location
+        while (BlockHere({ size: { w: gridCellSize, h: gridCellSize } }, location.x, location.y)) {
+            location = { x: Math.random() * worldBounds.x, y: Math.random() * worldBounds.y };
+        }
+        // spawn player
+        p.position = location;
+
+        // Play sound
+        POP_SFX.Play();
+
+        // FX
+        //StompFX({x: location.x, y: location.y - 1});
+    }
 }
 
 ////////////////////////////////////////////////////////

@@ -143,6 +143,10 @@ io.sockets.on('connection', function(socket) {
                     // Try to stomp the other player
                     //serverGame.TryStomp(myPlayer, targetPlayer);
 
+                    // Remove a life from this player
+                    targetPlayer.lives--;
+                    //ToDo: if all lives are gone, tell the losing player
+
                     // Tell all players that a has been stomped
                     for (var sID in SOCKET_LIST) {
                         //if (sID != socket.ID)
@@ -159,10 +163,13 @@ io.sockets.on('connection', function(socket) {
 
     socket.on(`clientUnStompPlayer`, function(data){
         // Tell all players that a has been stomped
-        for (var sID in SOCKET_LIST) {
-            SOCKET_LIST[sID].emit('serverUnStompPlayer', {
-                playerID: data.playerID
-            });
+        let p = serverGame.netPlayers[data.playerID];
+        if (p.lives > 0) {
+            for (var sID in SOCKET_LIST) {
+                SOCKET_LIST[sID].emit('serverUnStompPlayer', {
+                    playerID: data.playerID
+                });
+            }
         }
     });
 

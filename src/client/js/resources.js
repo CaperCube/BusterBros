@@ -64,6 +64,8 @@ const BUILD_SFX = new Sound(soundSRC[BUILD_SOUND]);
 const REMOVE_SFX = new Sound(soundSRC[REMOVE_SOUND]);
 const MUSIC_SFX = new Sound(soundSRC[MUSIC_SOUND], true, 0.25);
 
+//document.onclick = () => {MUSIC_SFX.Play()};
+
 ///////////////////////////////////////
 // Load functions
 ///////////////////////////////////////
@@ -98,6 +100,7 @@ function Sound(src, loop = false, volume = 1) {
     this.sound.setAttribute("controls", "none");
     this.sound.style.display = "none";
     this.sound.volume = volume;
+    //if (this.loop) this.sound.setAttribute("loop", "auto");
     document.body.appendChild(this.sound);
 
     this.Play = function(){
@@ -110,7 +113,7 @@ function Sound(src, loop = false, volume = 1) {
     this.sound.addEventListener(`ended`, () => {
         if (this.loop) {
             this.Play();
-            this.sound.setAttribute("loop", "auto");
+            //this.sound.setAttribute("loop", "auto");
         }
     });
 }

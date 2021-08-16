@@ -142,6 +142,7 @@ function NetPlayer(ID) {
     //
     // Player data
     //
+    this.lives = 10;
     this.score = 0;
     this.position = {x: 0, y: 0};
     this.dir = 1;
