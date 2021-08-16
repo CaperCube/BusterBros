@@ -96,12 +96,40 @@ function DrawPlayer(cctx, sheet, p) {
     //if (p.id == 0)
     //DrawAmmo(cctx, p);
 
+    // Draw nametag
+    DrawNameTag(cctx, p);
+
     // Draw tile selection
     cctx.strokeStyle = '#00FF00';
     cctx.lineWidth = 1;
     cctx.strokeRect(p.cursor.x + 0.5, p.cursor.y + 0.5, gridCellSize - 1, gridCellSize - 1);
     cctx.strokeStyle = '#FFFFFF88';
     cctx.strokeRect(p.cursor.x - 0.5, p.cursor.y - 0.5, gridCellSize + 1, gridCellSize + 1);
+}
+
+function DrawNameTag(cctx, p) {
+    let tagH = gridCellSize * 0.75;
+    let fontSize = tagH * 0.8;
+    cctx.font = `${fontSize}px sans-serif`;
+    let textSize = cctx.measureText(p.playerName);
+    let tagW = textSize.width;
+
+    var px = p.position.x + camera.position.x + (p.size.w/2) - (tagW/2);
+    var py = p.position.y + camera.position.y - tagH;
+    
+    // BG
+    cctx.fillStyle = "#222222aa";
+    cctx.fillRect(
+        px - 2,
+        py - fontSize,
+        tagW + 4,
+        tagH
+    );
+    
+    // Text
+    cctx.fillStyle = "#ffffffaa";
+    cctx.font = `${fontSize}px sans-serif`;
+    cctx.fillText(p.playerName, px, py);
 }
 
 function DrawHeath(cctx, p) {

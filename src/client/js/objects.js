@@ -47,6 +47,7 @@ function Spawn(ix, iy, color, pId) {
 
 function Player(ix, iy, color, pid) {
     this.id = pid || 0;
+    this.playerName = `Player`;
     
     this.size = {
         w: gridCellSize * 0.9,
