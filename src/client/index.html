@@ -18,6 +18,10 @@
     <script defer>
         $ = (n) => document.querySelector(n);
         $$ = (n) => document.querySelectorAll(n);
+        function HideShowDOM(o) {
+            if (o.style.display != "none") o.style.display = "none";
+            else o.style.display = "inline-block";
+        }
     </script>
     <script defer src="./js/socket.io.js"></script>
     <script defer src="js/network.js"></script>
@@ -48,5 +52,16 @@
         User Name: <input id="DOM_uName" type="text" onkeydown="EnterJoin(this)">
         <button onclick="JoinWithName($('#DOM_uName'))">Join</button>
     </span><br>
-    If your name is still "Player" after joining, that means there is no lobby open yet. Click "Host Game" to start one.
+    If your name is still "Player" after joining, that means there is no lobby open yet. Click "Host Game" to start one.<br>
+    <button onclick="HideShowDOM($('#DOM_controls'))">Control Settings</button> <button onclick="SaveLevel()">Save Level on Server</button><br>
+    <span id="DOM_controls" style="display: none;">
+        <button onclick="PressKeyPrompt($('#DOM_up_key'))" onkeydown="ChangeButton(this, Controls.Player1.upAxis1, $('#DOM_up_key'))">Aim Up</button> : <span id="DOM_up_key">up</span><br>
+        <button onclick="PressKeyPrompt($('#DOM_down_key'))" onkeydown="ChangeButton(this, Controls.Player1.downAxis1, $('#DOM_down_key'))">Aim Down</button> : <span id="DOM_down_key">down</span><br>
+        <button onclick="PressKeyPrompt($('#DOM_left_key'))" onkeydown="ChangeButton(this, Controls.Player1.leftAxis1, $('#DOM_left_key'))">Move Left</button> : <span id="DOM_left_key">left</span><br>
+        <button onclick="PressKeyPrompt($('#DOM_right_key'))" onkeydown="ChangeButton(this, Controls.Player1.rightAxis1, $('#DOM_right_key'))">Move Right</button> : <span id="DOM_right_key">right</span><br>
+        <button onclick="PressKeyPrompt($('#DOM_jump_key'))" onkeydown="ChangeButton(this, Controls.Player1.jump, $('#DOM_jump_key'))">Jump</button> : <span id="DOM_jump_key">x</span><br>
+        <button onclick="PressKeyPrompt($('#DOM_place_key'))" onkeydown="ChangeButton(this, Controls.Player1.fire1, $('#DOM_place_key'))">Place</button> : <span id="DOM_place_key">c</span><br>
+        <button onclick="PressKeyPrompt($('#DOM_respawn_key'))" onkeydown="ChangeButton(this, Controls.Player1.resapwn, $('#DOM_respawn_key'))">Resapwn</button> : <span id="DOM_respawn_key">r</span>
+    </span>
+    
 </body>

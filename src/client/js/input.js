@@ -107,6 +107,10 @@ function KeyDown(e) {
             }
         }
     }
+    // Prevent default actions for space
+    if (e.keyCode === 32) {
+        e.preventDefault();
+    }
 }
 
 function KeyUp(e) {
@@ -175,19 +179,38 @@ function GetInput(btnAr) {
 
 var Controls = {
     Player1: {
-        upAxis1: [Buttons.up, Buttons.w],
-        downAxis1: [Buttons.down, Buttons.s],
-        leftAxis1: [Buttons.left, Buttons.a],
-        rightAxis1: [Buttons.right, Buttons.d],
-        jump: [Buttons.x, Buttons.period],
-        crouch: [Buttons.control],
-        run: [Buttons.z, Buttons.slash],
-        fire1: [Buttons.c, Buttons.comma],
-        reload: [Buttons.r],
-        //invUp: [Buttons.e],
-        //invDown: [Buttons.q],
+        upAxis1: [Buttons.up],
+        downAxis1: [Buttons.down],
+        leftAxis1: [Buttons.left],
+        rightAxis1: [Buttons.right],
+        run: [Buttons.z],
+        jump: [Buttons.x],
+        fire1: [Buttons.c],
         invUp: [Buttons.equals],
         invDown: [Buttons.minus],
-        pause: [Buttons.p]
+        resapwn: [Buttons.r]
+    }
+}
+
+function PressKeyPrompt(o) {
+    o.innerHTML = "Press new key..."
+}
+
+function ChangeButton(o, buttonToChange, textToChange) {
+    if (o === document.activeElement) {
+        document.activeElement = null;
+        let buttonText = RemapButton(event.keyCode, buttonToChange);
+        console.log(`Key Changed!`);
+
+        textToChange.innerHTML = buttonText.name;
+    }
+}
+
+function RemapButton(newKeyCode, buttonToReplace) {
+    for (var b in Buttons) {
+        if (Buttons[b].code === newKeyCode) {
+            buttonToReplace[0] = Buttons[b];
+            return Buttons[b];
+        }
     }
 }

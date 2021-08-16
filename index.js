@@ -8,11 +8,19 @@ const nGame = require("./src/server/NetGame");
 ////////////////////////////////////////
 require('dotenv/config');
 const express = require('express');
+const { SocketAddress } = require("net");
 const port = process.env.PORT || 8080;
 // Server communication
 const app = express();
 const serv = require('http').Server(app);
 const io = require('socket.io')(serv,{});
+var fs = require('fs');
+
+////////////////////////////////////////
+// Constants
+////////////////////////////////////////
+const fExt = `.json`;
+const levelPath = `./levels/`;
 
 ////////////////////////////////////////
 // Server setup
@@ -88,6 +96,7 @@ io.sockets.on('connection', function(socket) {
         }
     }
 
+    // Player updates
     socket.on('clientChangeSkin', function(data) {
         // Set network player's skin
         if (serverGame.netPlayers[socket.ID]) serverGame.netPlayers[socket.ID].skin = data;
@@ -137,6 +146,7 @@ io.sockets.on('connection', function(socket) {
         }
     });
 
+    // Level listeners
     socket.on('clientAddTile', function(data){
         // Is the game running?
         //if (serverGame != null) {
@@ -179,7 +189,13 @@ io.sockets.on('connection', function(socket) {
             }
         }
     });
+    socket.on(`clientSaveLevel`, function(data) {
+        // Save the level in the server's level directory
+        let fName = (`level_${Math.random().toString()}`).replace(/\./g,'');
+        ExportFile(JSON.stringify(data), fName+fExt, levelPath);
+    });
 
+    // Player death
     socket.on('clientStompPlayer', function(data){
         // Get player with this socket.ID (if they exist)
         if (serverGame != null) {
@@ -225,13 +241,13 @@ io.sockets.on('connection', function(socket) {
         }
     });
 
+    // Sound triggers
     socket.on(`clientTriggerSound`, function(data){
         // Tell all clients to play the sound
         for (var sID in SOCKET_LIST) {
             SOCKET_LIST[sID].emit('serverTriggerSound', data);
         }
     });
-    
 
     // Create listener for this user disconnecting
     socket.on('disconnect', function(){
@@ -248,5 +264,33 @@ io.sockets.on('connection', function(socket) {
         //console.log(SOCKET_LIST);
     });
 });
+
+// Exports the given array as a text file 
+function ExportFile(saveData, fName, dir) {
+    // Get dir
+    var fileDir = dir || "";
+
+    // Save file
+    if (fileDir != "") {
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(fileDir)){
+            fs.mkdirSync(fileDir);
+        }
+        // Write file to directory
+        fs.writeFile(`${fileDir}/${fName}`, saveData, function(err, data){
+            if (err) {
+                return console.log(err);
+            }
+        });
+    }
+    else {
+        // Write file
+        fs.writeFile(`./${fName}`, saveData, function(err, data){
+            if (err) {
+                return console.log(err);
+            }
+        });
+    }
+}
 
 console.log("Server has started");

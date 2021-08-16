@@ -32,7 +32,9 @@ Here's some beginner / intermediate level instructions to get this bot up and ru
 11. To connect to the game, open a browser and type in your IP address followed by the port the server's running from (example: `192.168.0.1:8080`).
 12. Close VSCode or click in the terminal and press `Ctrl + c` to stop the server.
 
-**Note** You will likely need to port-forward for other off-network players to connect to your server. Only the server operator should need to perfor this set-up, all connecting players only need to do step 11.
+**Note**
+- Only the server operator should need to perfor this set-up, all connecting players only need to do step 11.
+- You will likely need to port-forward for other off-network players to connect to your server.
 -----------------------------------------------------------
 ## How to play:
 

@@ -117,6 +117,8 @@ function SaveLevel() {
     }
 
     console.log(saveArray);
+
+    socket.emit(`clientSaveLevel`, saveArray);
 }
 
 ////////////////////////////////////////////////////////
@@ -182,15 +184,6 @@ function Init() {
     PlayPause();
 }
 
-/*
-function TempSpawnPlayer() {
-    // Start game
-    startGame(Walls);
-}
-
-//Buttons.r.onPress = TempSpawnPlayer;
-*/
-
 socket.on(`joinConfirm`, function(data){
     // Load server's leve
     if (data.level?.length > 1) {
@@ -234,9 +227,6 @@ function RenderCanvas() {
     
     // Move camera
     if (cameraMove) CameraControl(camera);
-
-    // Save level controlls
-    Buttons.m.onPress = () => {SaveLevel()};
 
     // Draw Walls
     for (var i = 0; i < Walls.length; i++) {

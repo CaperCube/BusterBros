@@ -246,7 +246,7 @@ function ControlLoopPlatformer(p) {
     Controls.Player1.fire1.forEach(b => b.onPress = buildfunc);
 
     //UnStomp
-    Controls.Player1.pause.forEach(b => b.onPress = () => {if (p.stomped) UnStompSelf()});
+    Controls.Player1.resapwn.forEach(b => b.onPress = () => {if (p.stomped) UnStompSelf()});
 
     // Change block
     function NumberPickTile(num) {
