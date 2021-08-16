@@ -6,9 +6,9 @@
 <html>
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" charset="utf-8">
-    <title>Platformer Test</title>
+    <title>Buster Bros</title>
     <meta name="author" content="Eric Kalpin">
-    <link rel='icon' type='image/png' href='img/logo.png'>
+    <link rel='icon' type='image/png' href='src/logo.png'>
     <link rel="stylesheet" href="main.css">
     <!--
     ////////////////////////////////////////////////////////
@@ -40,5 +40,13 @@
     ////////////////////////////////////////////////////////
     -->
     <!--<button id="join_button" onclick="startGame();">Join Game</button><br>-->
-    <canvas id="my_canvas"></canvas>
+    WARNING! This will override any existing lobby -> <button onclick="startGame(Walls)">Host Game</button><br>
+    <canvas id="my_canvas"></canvas><br>
+    Skin: <button onclick="ChangeSkin(0)">Blue</button>
+    <button onclick="ChangeSkin(1)">Red</button>
+    <span id="DOM_join_options">
+        User Name: <input id="DOM_uName" type="text" onkeydown="EnterJoin(this)">
+        <button onclick="JoinWithName($('#DOM_uName'))">Join</button>
+    </span><br>
+    If your name is still "Player" after joining, that means there is no lobby open yet. Click "Host Game" to start one.
 </body>

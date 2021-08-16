@@ -92,7 +92,7 @@ function DrawPlayer(cctx, sheet, p) {
     cctx.setTransform(1,0,0,1,0,0);
 
     // Draw hp bar
-    //if (drawHp) DrawHeath(cctx, p);
+    if (drawHp) DrawHeath(cctx, p);
     //if (p.id == 0)
     //DrawAmmo(cctx, p);
 
@@ -118,7 +118,7 @@ function DrawNameTag(cctx, p) {
     var py = p.position.y + camera.position.y - tagH;
     
     // BG
-    cctx.fillStyle = "#222222aa";
+    cctx.fillStyle = "#00000088";
     cctx.fillRect(
         px - 2,
         py - fontSize,
@@ -127,7 +127,7 @@ function DrawNameTag(cctx, p) {
     );
     
     // Text
-    cctx.fillStyle = "#ffffffaa";
+    cctx.fillStyle = "#ffffff88";
     cctx.font = `${fontSize}px sans-serif`;
     cctx.fillText(p.playerName, px, py);
 }
@@ -136,7 +136,7 @@ function DrawHeath(cctx, p) {
     var px = p.position.x + (p.size.w/2);
     var yPoint = p.position.y - (healthBar.size.h*2) + camera.position.y
     var sPoint = px - (healthBar.size.w/2) + camera.position.x;
-    var gWidth = healthBar.size.w * (p.health/100);
+    var gWidth = healthBar.size.w * (p.lives/10);
     
     // BG
     cctx.fillStyle = "#ff000066";
@@ -195,6 +195,31 @@ function DrawBullet(cctx, b) {
     cctx.fill();
 }
 
+function DrawWinner(cctx) {
+    let nameText = `${winningPlayer} has won!`;
+    let tagH = gridCellSize * 4;
+    let fontSize = tagH * 0.8;
+    cctx.font = `${fontSize}px sans-serif`;
+    let textSize = cctx.measureText(nameText);
+    let tagW = textSize.width;
+
+    var px = worldBounds.x/2 + camera.position.x - (tagW/2);
+    var py = worldBounds.y/2 + camera.position.y;
+    
+    // BG
+    cctx.fillStyle = "#00000088";
+    cctx.fillRect(
+        px - 2,
+        py - fontSize,
+        tagW + 4,
+        tagH
+    );
+    
+    // Text
+    cctx.fillStyle = "#ffffff88";
+    cctx.font = `${fontSize}px sans-serif`;
+    cctx.fillText(nameText, px, py);
+}
 //
 // UI
 //
@@ -258,32 +283,34 @@ function DrawUI(cctx, sheet, worldB) {
     }
 
     // Draw players items and such
-    for (var i = 0; i < 46; i++) {
-        let ti = Players[myID]?.block;
-        let idx = ti + i;
-        let maxTiles = (sheet.width * sheet.height) / gridCellSize;
-        if (idx > maxTiles) idx -= maxTiles;
+    if (Players[myID]) {
+        for (var i = 0; i < 46; i++) {
+            let ti = Players[myID]?.block;
+            let idx = ti + i;
+            let maxTiles = (sheet.width * sheet.height) / gridCellSize;
+            if (idx > maxTiles) idx -= maxTiles;
 
-        if (idx) tile = GetPosByIndex(sheet, gridCellSize, idx);
-        else tile = GetPosByIndex(sheet, gridCellSize, 0);
-        let ty = 0;
-        if (i >= 23) ty = 1;
-        cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (1 + (i % 23)) * gridCellSize, bottomUiY + ((1 + ty) * gridCellSize), gridCellSize, gridCellSize);
+            tile = GetPosByIndex(sheet, gridCellSize, idx) || 0;
+            //else tile = GetPosByIndex(sheet, gridCellSize, 0);
+            let ty = 0;
+            if (i >= 23) ty = 1;
+            cctx.drawImage(sheet, tile.x, tile.y, gridCellSize, gridCellSize, (1 + (i % 23)) * gridCellSize, bottomUiY + ((1 + ty) * gridCellSize), gridCellSize, gridCellSize);
 
-        // text
-        if (i > 0 && i < 11) {
-            cctx.fillStyle = `black`;
-            cctx.font = 'bold 10px sans-serif';
-            cctx.fillText(`${i%10}`, (i + 1) * gridCellSize + 5, bottomUiY + (1 * gridCellSize) - 3);
+            // text
+            if (i > 0 && i < 11) {
+                cctx.fillStyle = `black`;
+                cctx.font = 'bold 10px sans-serif';
+                cctx.fillText(`${i%10}`, (i + 1) * gridCellSize + 5, bottomUiY + (1 * gridCellSize) - 3);
+            }
+
+            // Selected Tile
+            cctx.strokeStyle = '#00FF00';
+            cctx.lineWidth = 1;
+            cctx.strokeRect((1 * gridCellSize) + 0.5, bottomUiY + (1 * gridCellSize) + 0.5, gridCellSize - 1, gridCellSize - 1);
+            cctx.strokeStyle = '#FFFFFF88';
+            cctx.strokeRect((1 * gridCellSize) - 0.5, bottomUiY + (1 * gridCellSize) - 0.5, gridCellSize + 1, gridCellSize + 1);
         }
     }
-
-    // Selected Tile
-    cctx.strokeStyle = '#00FF00';
-    cctx.lineWidth = 1;
-    cctx.strokeRect((1 * gridCellSize) + 0.5, bottomUiY + (1 * gridCellSize) + 0.5, gridCellSize - 1, gridCellSize - 1);
-    cctx.strokeStyle = '#FFFFFF88';
-    cctx.strokeRect((1 * gridCellSize) - 0.5, bottomUiY + (1 * gridCellSize) - 0.5, gridCellSize + 1, gridCellSize + 1);
     
 }
 

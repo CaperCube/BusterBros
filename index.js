@@ -49,22 +49,73 @@ io.sockets.on('connection', function(socket) {
     ///////////////////////////////////////
     // Client join
     ///////////////////////////////////////
-    // Tell new player their ID
-    socket.emit('joinConfirm', {level: serverGame.level, id: socket.ID});
     // Add player to game's playerlist
     //serverGame.netPlayers.push(socket.player);
     serverGame.netPlayers[socket.ID] = socket.player;
 
+    // If no game started, start one when a player connects
+    /*
+    if (!serverGame.isRunning) {
+        // Init the level from the start game request
+        //serverGame.level = data.level;
+
+        // Send to all players the server level
+        for (var sID in SOCKET_LIST) {
+            if (sID != socket.ID) SOCKET_LIST[sID].emit('loadServersLevel', serverGame.level);
+        }
+
+        // Start the game!
+        serverGame.StartGame(SOCKET_LIST);
+    }
+    */
+
     ///////////////////////////////////////
     // Generate and init server-side message listeners from NetGame object
     ///////////////////////////////////////
+    function EvalWinner() {
+        let playerCount = Object.keys(serverGame.netPlayers).length;
+        let lostPlayers = 0;
+        let wonPlayer = null;
+        for (var p in serverGame.netPlayers) {
+            if (serverGame.netPlayers[p].lives <= 0) lostPlayers++;
+            else wonPlayer = serverGame.netPlayers[p];
+        }
+        if (lostPlayers === playerCount-1) {
+            // Tell all players that someone has won
+            for (var sID in SOCKET_LIST) {
+                SOCKET_LIST[sID].emit('serverPlayerWon', wonPlayer.socketID);
+            }
+        }
+    }
+
+    socket.on('clientChangeSkin', function(data) {
+        // Set network player's skin
+        if (serverGame.netPlayers[socket.ID]) serverGame.netPlayers[socket.ID].skin = data;
+        console.log(`${socket.ID} has changed their skin to ${data}`);
+    });
+
+    socket.on('clientChangeName', function(data) {
+        // Set network player's name
+        if (serverGame.netPlayers[socket.ID]) serverGame.netPlayers[socket.ID].name = data;
+        console.log(`${socket.ID} has changed their name to ${data}`);
+
+        // Join the player to the game
+        socket.emit('joinConfirm', {level: serverGame.level, id: socket.ID});
+    });
+
     socket.on('clientStartGame', function(data) {
         // Init the level from the start game request
         serverGame.level = data.level;
 
         // Send to all players the server level
         for (var sID in SOCKET_LIST) {
+            // Reset lives
+            serverGame.netPlayers[sID].lives = 10;
+            // Set level to hosts
             if (sID != socket.ID) SOCKET_LIST[sID].emit('loadServersLevel', serverGame.level);
+
+            // Tell players to reset game
+            SOCKET_LIST[sID].emit('resetGame');
         }
 
         // Start the game!
@@ -145,7 +196,8 @@ io.sockets.on('connection', function(socket) {
 
                     // Remove a life from this player
                     targetPlayer.lives--;
-                    //ToDo: if all lives are gone, tell the losing player
+                    //If all lives are gone, tell the losing player
+                    EvalWinner();
 
                     // Tell all players that a has been stomped
                     for (var sID in SOCKET_LIST) {

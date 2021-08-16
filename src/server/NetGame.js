@@ -14,6 +14,7 @@ function NetGame() {
     // Keep track of an active game's state and data here
     this.serverTickRef; // This will hold the setInterval reference for the server updates
     this.gameID = GenerateID();
+    this.isRunning = false;
 
     this.gridCellSize = 16; // This should be a constant
     this.level = null; // The level that's served to each player when a game is started
@@ -41,6 +42,7 @@ function NetGame() {
         console.log(`A new Net game has been started!\nGame ID: ${this.gameID}`);
 
         var intervalGameRef = this;
+        this.isRunning = true;
 
         // Create interval
         this.serverTickRef = setInterval(function(){
@@ -132,6 +134,7 @@ function NetPlayer(ID) {
     //
     this.socketID = ID || 0;
     this.name = "Player " + this.socketID;
+    this.skin = 0;
     this.type = "Player";
     
     //

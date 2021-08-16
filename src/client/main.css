@@ -3,6 +3,8 @@ body {
     padding: 0px;
 	text-align: center;
 	background-color: black;
+	color: white;
+	font-family: sans-serif;
 }
 
 #my_canvas {

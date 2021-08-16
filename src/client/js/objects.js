@@ -48,6 +48,7 @@ function Spawn(ix, iy, color, pId) {
 function Player(ix, iy, color, pid) {
     this.id = pid || 0;
     this.playerName = `Player`;
+    this.skin = 0;
     
     this.size = {
         w: gridCellSize * 0.9,
@@ -137,7 +138,7 @@ function Bullet(ix, iy, owner, vx, vy) {
 }
 
 var healthBar = {
-    size: {w: gridCellSize*2, h: gridCellSize/2}
+    size: {w: gridCellSize*2, h: gridCellSize/4}
 }
 var ammoBar = {
     size: {w: gridCellSize*2, h: gridCellSize/4}

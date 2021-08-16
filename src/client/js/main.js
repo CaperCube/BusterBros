@@ -41,7 +41,7 @@ let bounce = 0.2;
 
 let drawHp = true;
 let editorMode = false; // Not implemented yet
-let cameraMove = true;
+let cameraMove = false;
 let debugMode = false; // Not implemented yet
 
 let worldBounds = {
@@ -93,10 +93,10 @@ function UpdateBullet(b, i) {
 }
 
 function CameraControl(c) {
-    if (Buttons.i.pressed) c.position.y -= c.speed;
-    if (Buttons.k.pressed) c.position.y += c.speed;
-    if (Buttons.j.pressed) c.position.x -= c.speed;
-    if (Buttons.l.pressed) c.position.x += c.speed;
+    if (Buttons.i.pressed) c.position.y += c.speed;
+    if (Buttons.k.pressed) c.position.y -= c.speed;
+    if (Buttons.j.pressed) c.position.x += c.speed;
+    if (Buttons.l.pressed) c.position.x -= c.speed;
     if (Buttons.o.pressed) c.position = {x: 0, y: 0};
 }
 
@@ -176,18 +176,20 @@ function LoadLevel(bgToLoad, levelToLoad) { // ToDo: store levels as 2D array
 
 function Init() {
     // Setup level
-    LoadLevel(tileBG2, tileMapLevel5);
+    LoadLevel(tileBG2, tileMapLevel4);
     
     // Start rendering
     PlayPause();
 }
 
+/*
 function TempSpawnPlayer() {
     // Start game
     startGame(Walls);
 }
 
-Buttons.r.onPress = TempSpawnPlayer;
+//Buttons.r.onPress = TempSpawnPlayer;
+*/
 
 socket.on(`joinConfirm`, function(data){
     // Load server's leve
@@ -206,11 +208,12 @@ socket.on(`joinConfirm`, function(data){
 
     // Temporary player spawn override
     Players[myID] = new Player(
-        4 * gridCellSize,
-        6 * gridCellSize,
+        0,
+        0,
         playerColors[0],
         myID
     );
+    RespawnPlayer(Players[myID]);
 });
 
 ////////////////////////////////////////////////////////
@@ -249,9 +252,12 @@ function RenderCanvas() {
     for (var p in Players) {
         if (Players[p] != undefined) {
             // If drawing client player, use default skin
-            if (Players[p].id === myID) DrawPlayer(ctx, loadedImages[PLAYER_SPRITE], Players[p]);
+            //if (Players[p].id === myID) DrawPlayer(ctx, loadedImages[Players[p].skin + PLAYER_SPRITE], Players[p]);
             // else use alternate skin
-            else DrawPlayer(ctx, loadedImages[PLAYER_OTHER_SPRITE], Players[p]);
+            //else DrawPlayer(ctx, loadedImages[Players[p].skin + PLAYER_SPRITE], Players[p]);
+
+            // Draw players with chosen skin
+            DrawPlayer(ctx, loadedImages[Players[p].skin + PLAYER_SPRITE], Players[p]);
         }
     }
 
@@ -260,6 +266,9 @@ function RenderCanvas() {
     
     // UI layer
     DrawUI(ctx, loadedImages[MAIN_SHEET], worldBounds);
+
+    // Draw winner text
+    if (winningPlayer) DrawWinner(ctx);
 
     // Render again again (change this to a setInterval())
 }

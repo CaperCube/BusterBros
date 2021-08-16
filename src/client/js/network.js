@@ -1,7 +1,22 @@
 const socket = io();
 
-function CreateMyPlayer() {
-    socket.emit(`createPlayer`);
+function EnterJoin(o) {
+    if (event.key === 'Enter') {
+        o.blur();
+        JoinWithName(o);
+    }
+}
+
+function JoinWithName(o) {
+    console.log(`sending name to server`);
+    socket.emit(`clientChangeName`, o.value);
+    o.blur();
+    $('#DOM_join_options').style.display = 'none';
+}
+
+function ChangeSkin(o) {
+    console.log(`sending skin to server`);
+    socket.emit(`clientChangeSkin`, o);
 }
 
 socket.on(`serverPlayerLeft`, function(data){
@@ -21,11 +36,15 @@ socket.on(`serverPlayerLeft`, function(data){
 
 function startGame(myLevel) {
     // Delete all players except mine
-    for (var p in Players) if (Players[p].id != myID) Players.splice(Players[p], 1);
+    //for (var p in Players) if (Players[p].id != myID) Players.splice(Players[p], 1);
     // Send request to start net game
     socket.emit(`clientStartGame`, {level: myLevel});
 }
 //Buttons.s.onPress = startGame;
+
+socket.on(`resetGame`, function(data) {
+    winningPlayer = null;
+});
 
 socket.on(`loadServersLevel`, function(data){
     console.log(`Server has given us a new level`);
@@ -50,7 +69,10 @@ socket.on(`ServerPacket`, function(data){
         //console.log(Players[nPlayer.socketID]);
 
         //if (Players[nPlayer.socketID] !== undefined && Players[nPlayer.socketID] !== null) {
+        
+        // If this is not the client player...
         if (nPlayer.socketID !== myID) {
+            // Update this player
             if (Players[nPlayer.socketID]) {
                 Players[nPlayer.socketID].position = nPlayer.position;
                 Players[nPlayer.socketID].dir = nPlayer.dir;
@@ -78,6 +100,10 @@ socket.on(`ServerPacket`, function(data){
                 SendPlayerData(playerData);
             }
         }
+        // Either way, update the name
+        Players[nPlayer.socketID].playerName = nPlayer.name;
+        Players[nPlayer.socketID].skin = nPlayer.skin;
+        Players[nPlayer.socketID].lives = nPlayer.lives;
     }
 });
 
@@ -185,3 +211,9 @@ socket.on(`serverTriggerSound`, function(data){
     }
 });
 //#endregion
+
+let winningPlayer = null;
+socket.on(`serverPlayerWon`, function(data){
+    // Display message that player data was won
+    if (Players[data]) winningPlayer = Players[data].playerName;
+});
