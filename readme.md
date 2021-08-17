@@ -9,6 +9,8 @@ Some goals for this project include but are not limited to:
 2. Live collaborative level editor
 3. Fun game
 
+![Stomping on a player](/social/BasicStomp.gif?raw=true "Stomping on a player")
+
 -----------------------------------------------------------
 ## Contribution:
 

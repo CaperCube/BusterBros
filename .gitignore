@@ -7,11 +7,8 @@ node_modules/
 # dotenv environment variables file
 .env
 
-# photoshop or other working files
-# .psd
-# .act
+# clutter
 reference/
-social/
 dump/
 levels/
 BusterBros_ToDo.txt

@@ -157,7 +157,7 @@ function DrawHeath(cctx, p) {
     );
 
     // Parry
-    if (p.canParry) {
+    if (p.id === myID && p.canParry) {
         cctx.fillStyle = "#ffffff";
         cctx.fillRect(
             sPoint + healthBar.size.w + 2,
