@@ -15,6 +15,8 @@ var Buttons = {
     lmb: {name: "left mouse", type: "mouse", pressed: false, onPress: testButtonDown, onRelease: testButtonUp}, // left mouse button
     rmb: {name: "right mouse", type: "mouse", pressed: false, onPress: testButtonDown, onRelease: testButtonUp}, // right mouse button
     mmb: {name: "middle mouse", type: "mouse", pressed: false, onPress: testButtonDown, onRelease: testButtonUp}, // middle mouse button
+    scrollUp: {name: "scroll up", type: "mouse", pressed: false, onPress: testButtonDown, onRelease: testButtonUp},
+    scrollDown: {name: "scroll down", type: "mouse", pressed: false, onPress: testButtonDown, onRelease: testButtonUp},
     //
     backspace: {name: "backspace", code: 8, pressed: false, onPress: testButtonDown, onRelease: testButtonUp},
     tab: {name: "tab", code: 9, pressed: false, onPress: testButtonDown, onRelease: testButtonUp},
@@ -92,6 +94,7 @@ document.addEventListener('keydown', KeyDown);
 document.addEventListener('keyup', KeyUp);
 document.addEventListener('mousedown', MouseDown);
 document.addEventListener('mouseup', MouseUp);
+document.addEventListener('wheel', MouseScroll);
 
 function KeyDown(e) {
     // loop through all buttons, and set pressed key to true
@@ -165,6 +168,18 @@ function MouseUp(e) {
     }
 }
 
+function MouseScroll(e) {
+    if (e.deltaY > 0) {
+        if (Buttons.scrollUp.hasOwnProperty("onPress")) Buttons.scrollUp.onPress();
+    }
+    else if (e.deltaY < 0) {
+        if (Buttons.scrollDown.hasOwnProperty("onPress")) Buttons.scrollDown.onPress();
+    }
+    // Release after triggered
+    if (Buttons.scrollUp.hasOwnProperty("onRelease")) Buttons.scrollUp.onRelease();
+    if (Buttons.scrollDown.hasOwnProperty("onRelease")) Buttons.scrollDown.onRelease();
+}
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Controls
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -192,6 +207,32 @@ var Controls = {
     }
 }
 
+const arrowPreset = {
+    upAxis1: [Buttons.up],
+    downAxis1: [Buttons.down],
+    leftAxis1: [Buttons.left],
+    rightAxis1: [Buttons.right],
+    run: [Buttons.z, Buttons.comma],
+    jump: [Buttons.x, Buttons.period],
+    fire1: [Buttons.c, Buttons.slash],
+    invUp: [Buttons.equals],
+    invDown: [Buttons.minus],
+    resapwn: [Buttons.r]
+};
+
+const WASDPreset = {
+    upAxis1: [Buttons.w],
+    downAxis1: [Buttons.s],
+    leftAxis1: [Buttons.a],
+    rightAxis1: [Buttons.d],
+    run: [Buttons.shift],
+    jump: [Buttons.space],
+    fire1: [Buttons.lmb],
+    invUp: [Buttons.scrollUp, Buttons.equals],
+    invDown: [Buttons.scrollDown, Buttons.minus],
+    resapwn: [Buttons.r]
+};
+
 function PressKeyPrompt(o) {
     o.innerHTML = "Press new key..."
 }
@@ -199,10 +240,23 @@ function PressKeyPrompt(o) {
 function ChangeButton(o, buttonToChange, textToChange) {
     if (o === document.activeElement) {
         document.activeElement = null;
+        o.blur();
         let buttonText = RemapButton(event.keyCode, buttonToChange);
-        console.log(`Key Changed!`);
 
+        if (event.button == 0)
+        {
+            buttonToChange[0] = Buttons.lmb;
+        }
+        else if (event.button == 1)
+        {
+            buttonToChange[0] = Buttons.mmb;
+        }
+        else if (event.button == 2) 
+        {
+            buttonToChange[0] = Buttons.rmb;
+        }
         textToChange.innerHTML = buttonText.name;
+        console.log(`Key Changed!`);
     }
 }
 
@@ -213,4 +267,19 @@ function RemapButton(newKeyCode, buttonToReplace) {
             return Buttons[b];
         }
     }
+}
+
+function ApplyControlPreset(preset) {
+    // Change preset
+    Controls.Player1 = preset;
+    // Change DOM texts
+    $("#DOM_up_key").innerHTML = Controls.Player1.upAxis1[0].name;
+    $("#DOM_down_key").innerHTML = Controls.Player1.downAxis1[0].name;
+    $("#DOM_left_key").innerHTML = Controls.Player1.leftAxis1[0].name;
+    $("#DOM_right_key").innerHTML = Controls.Player1.rightAxis1[0].name;
+    $("#DOM_jump_key").innerHTML = Controls.Player1.jump[0].name;
+    $("#DOM_place_key").innerHTML = Controls.Player1.fire1[0].name;
+    $("#DOM_invup_key").innerHTML = Controls.Player1.invUp[0].name;
+    $("#DOM_invdown_key").innerHTML = Controls.Player1.invDown[0].name;
+    $("#DOM_respawn_key").innerHTML = Controls.Player1.resapwn[0].name;
 }

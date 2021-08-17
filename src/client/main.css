@@ -5,6 +5,7 @@ body {
 	background-color: black;
 	color: white;
 	font-family: sans-serif;
+	user-select: none;
 }
 
 #my_canvas {
