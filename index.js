@@ -189,6 +189,7 @@ io.sockets.on('connection', function(socket) {
             }
         }
     });
+
     socket.on(`clientSaveLevel`, function(data) {
         // Save the level in the server's level directory
         let fName = (`level_${Math.random().toString()}`).replace(/\./g,'');
@@ -205,23 +206,30 @@ io.sockets.on('connection', function(socket) {
                 
                 // Check if data.otherPlayer exists
                 let targetPlayer = serverGame.netPlayers[data.otherPlayerID];
-                if (targetPlayer != null){
+                if (targetPlayer != null) {
 
-                    // Try to stomp the other player
-                    //serverGame.TryStomp(myPlayer, targetPlayer);
+                    // If target is parrying, deflect stomp
+                    if (targetPlayer.parry) {
+                        // Deflect
+                        SOCKET_LIST[data.attackingPlayerID].emit('serverDeflected');
+                    }
+                    else {
+                        // Try to stomp the other player
+                        //serverGame.TryStomp(myPlayer, targetPlayer);
 
-                    // Remove a life from this player
-                    targetPlayer.lives--;
-                    //If all lives are gone, tell the losing player
-                    EvalWinner();
+                        // Remove a life from this player
+                        targetPlayer.lives--;
+                        //If all lives are gone, tell the losing player
+                        EvalWinner();
 
-                    // Tell all players that a has been stomped
-                    for (var sID in SOCKET_LIST) {
-                        //if (sID != socket.ID)
-                        SOCKET_LIST[sID].emit('serverStomped', {
-                            attackingPlayerID: data.attackingPlayerID,
-                            otherPlayerID : data.otherPlayerID
-                        });
+                        // Tell all players that a has been stomped
+                        for (var sID in SOCKET_LIST) {
+                            //if (sID != socket.ID)
+                            SOCKET_LIST[sID].emit('serverStomped', {
+                                attackingPlayerID: data.attackingPlayerID,
+                                otherPlayerID : data.otherPlayerID
+                            });
+                        }
                     }
                 }
 

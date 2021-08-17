@@ -74,9 +74,12 @@ function Player(ix, iy, color, pid) {
     this.moveSpeed = 0.4;
     this.dir = 1;
     this.look = 0;
-    this.parry = false; // temporary
+    this.parry = false;
+    this.canParry = true;
     
-    this.jumpSpeed = 2.8;//3.2;
+    this.jumpSpeed = 1.6; //2.8; //3.2;
+    this.jumpCurveTime = 100; // time in ms
+    this.allowJumpCurve = false;
     this.totalJumps = 1;
     this.usedJumps = 0;
     

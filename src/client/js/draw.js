@@ -155,6 +155,17 @@ function DrawHeath(cctx, p) {
         gWidth,
         healthBar.size.h
     );
+
+    // Parry
+    if (p.canParry) {
+        cctx.fillStyle = "#ffffff";
+        cctx.fillRect(
+            sPoint + healthBar.size.w + 2,
+            yPoint,
+            healthBar.size.h,
+            healthBar.size.h
+        );
+    }
 }
 
 function DrawAmmo(cctx, p) {

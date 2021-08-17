@@ -73,8 +73,9 @@ function DoGravity(p) {
         p.position.y += p.velocity.y;
     }
     else {
-        // Bounce
-        Bounce();
+        // Coolide with tile on the bottom & top
+        let thisTile = BlockHere(p, p.position.x, p.position.y + p.velocity.y);
+        CheckAllTileTypes(p, thisTile, Bounce);
     }
     // world bounds
     if ((p.position.y + (p.size.h/2) + p.velocity.y) < 0) {
@@ -114,12 +115,22 @@ function ControlCam() {
 function ControlLoopPlatformer(p) {
     // Jump
     function jumpfunc() {
+        Controls.Player1.jump.pressed = true;
+
         if (p.usedJumps < p.totalJumps && !p.stomped) {
             p.usedJumps += 1;
             p.velocity.y = -p.jumpSpeed;
+
+            // Jump held velocity curve
+            p.allowJumpCurve = true;
+            setTimeout(() => { p.allowJumpCurve = false; }, p.jumpCurveTime);
         }
 
         TriggerNetworkSound('jump');
+    }
+
+    if (p.allowJumpCurve && Controls.Player1.jump.pressed) {
+        p.velocity.y -= 0.15;
     }
     
     // Shoot
@@ -225,17 +236,25 @@ function ControlLoopPlatformer(p) {
 
         // Parry, Look down
         if (GetInput(Controls.Player1.downAxis1)) {
-            p.parry = true;
             p.look = -1;
+            // Parry
+            if (p.canParry) {
+                p.parry = true;
+                p.canParry = false;
+                // Send server message
+                socket.emit(`clientParry`);
+                // Wait before allowing another parry
+                setTimeout(() => { p.canParry = true; }, 1500);
+                // Turn off parry after a short amount of time
+                setTimeout(() => { p.parry = false; }, 70);
+            }
         }
         // Look up
         else if (GetInput(Controls.Player1.upAxis1)) {
-            p.parry = false;
             p.look = 1;
         }
         // default
         else {
-            p.parry = false;
             p.look = 0;
         }
     }
@@ -243,6 +262,7 @@ function ControlLoopPlatformer(p) {
     //#region Assign controls
     // Jump, Action
     Controls.Player1.jump.forEach(b => b.onPress = jumpfunc);
+    Controls.Player1.jump.forEach(b => b.onRelease = function(){Controls.Player1.jump.pressed = false});
     Controls.Player1.fire1.forEach(b => b.onPress = buildfunc);
 
     //UnStomp
@@ -439,4 +459,34 @@ function PlaceFreeCustom(p, xNew, yNew, list) {
         }
     }
     return true;
+}
+
+function CheckAllTileTypes(p, t, fallback) {
+
+    if (deadlyTiles.includes(t.tileIndex)) {
+        // Kill player
+        DeadlyTileAction(p);
+    }
+    else if (bouncyTiles.includes(t.tileIndex)) {
+        // Bounce player
+        BouncyTileAction(p);
+    }
+    else {
+        // Normal bounce
+        fallback();
+    }
+}
+
+function DeadlyTileAction(p) {
+    // Kill player
+    if (!p.stomped) StompPlayer(p);
+}
+
+function BouncyTileAction(p) {
+    // Bounce player
+    if (p.velocity.y > 0) {
+        if (p.velocity.y > 1) TriggerNetworkSound('land');
+        p.usedJumps = 0;
+    }
+    p.velocity.y *= -bounce*4;
 }

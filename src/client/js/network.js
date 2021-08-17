@@ -38,6 +38,7 @@ function startGame(myLevel) {
     // Delete all players except mine
     //for (var p in Players) if (Players[p].id != myID) Players.splice(Players[p], 1);
     // Send request to start net game
+    if (Players[myID]) RespawnPlayer(Players[myID]);
     socket.emit(`clientStartGame`, {level: myLevel});
 }
 //Buttons.s.onPress = startGame;
@@ -175,6 +176,12 @@ socket.on(`serverStomped`, function(data){
     let p = Players[data.otherPlayerID];
     // Stomp player
     GetStomped(p);
+});
+
+// Got Deflected
+socket.on(`serverDeflected`, function(data) {
+    // boost into the air
+    Players[myID].velocity.y = -4;
 });
 
 /*
