@@ -242,19 +242,6 @@ function ChangeButton(o, buttonToChange, textToChange) {
         document.activeElement = null;
         o.blur();
         let buttonText = RemapButton(event.keyCode, buttonToChange);
-
-        if (event.button == 0)
-        {
-            buttonToChange[0] = Buttons.lmb;
-        }
-        else if (event.button == 1)
-        {
-            buttonToChange[0] = Buttons.mmb;
-        }
-        else if (event.button == 2) 
-        {
-            buttonToChange[0] = Buttons.rmb;
-        }
         textToChange.innerHTML = buttonText.name;
         console.log(`Key Changed!`);
     }
