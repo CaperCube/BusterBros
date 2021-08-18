@@ -98,6 +98,10 @@ const bouncyTiles = [
     379
 ];
 
+const slipperyTiles = [
+    151
+];
+
 const breakableTiles = [
     155
 ];

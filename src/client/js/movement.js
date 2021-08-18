@@ -2,6 +2,10 @@
 // Platformer controller
 ////////////////////////////////////////////////////////
 function UpdatePositionX(p) {
+    function Bounce() {
+        p.velocity.x *= -bounce;
+    }
+
     // Check x
     if (PlaceFree(p, p.position.x + p.velocity.x, p.position.y)) {
         // Wrap
@@ -12,7 +16,9 @@ function UpdatePositionX(p) {
             }
             else {
                 // Bounce
-                p.velocity.x *= -bounce;
+                //Bounce();
+                let thisTile = BlockHere(p, worldBounds.x - (gridCellSize/2), p.position.y);
+                if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
             }
         }
         else if ((p.position.x + (p.size.w/2) + p.velocity.x) >= worldBounds.x) {
@@ -22,14 +28,18 @@ function UpdatePositionX(p) {
             }
             else {
                 // Bounce
-                p.velocity.x *= -bounce;
+                //Bounce();
+                let thisTile = BlockHere(p, 0, p.position.y);
+                if (thisTile)CheckAllTileTypes(p, thisTile, Bounce);
             }
         }
         // Do movement
         else p.position.x += p.velocity.x;
     }
     else {
-        p.velocity.x *= -bounce;
+        // Collide with tile on the left or right
+        let thisTile = BlockHere(p, p.position.x + p.velocity.x, p.position.y);
+        if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
     }
 }
 
@@ -73,9 +83,9 @@ function DoGravity(p) {
         p.position.y += p.velocity.y;
     }
     else {
-        // Coolide with tile on the bottom & top
+        // Collide with tile on the bottom or top
         let thisTile = BlockHere(p, p.position.x, p.position.y + p.velocity.y);
-        CheckAllTileTypes(p, thisTile, Bounce);
+        if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
     }
     // world bounds
     if ((p.position.y + (p.size.h/2) + p.velocity.y) < 0) {
@@ -85,7 +95,9 @@ function DoGravity(p) {
         }
         else {
             // Bounce
-            Bounce();
+            //Bounce();
+            let thisTile = BlockHere(p, p.position.x,  worldBounds.y - (gridCellSize/2));
+            if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
         }
     }
     else if ((p.position.y + (p.size.h/2) + p.velocity.y) >= worldBounds.y) {
@@ -95,7 +107,9 @@ function DoGravity(p) {
         }
         else {
             // Bounce
-            Bounce();
+            //Bounce();
+            let thisTile = BlockHere(p, p.position.x, 0);
+            if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
         }
     }
     // Do accelleration
@@ -113,6 +127,12 @@ function ControlCam() {
 }
 
 function ControlLoopPlatformer(p) {
+    // Update position
+    UpdatePositionX(p);
+    DoGravity(p);
+    //WorldWrapX(p);
+    UpdatePickups(p);
+
     // Jump
     function jumpfunc() {
         Controls.Player1.jump.pressed = true;
@@ -212,11 +232,17 @@ function ControlLoopPlatformer(p) {
     if (!p.stomped) {
         // Move
         if (GetInput(Controls.Player1.leftAxis1)) {
-            if (p.look >= 0) p.velocity.x -= p.moveSpeed;
+            if (p.look >= 0) {
+                if (isSlipping) p.velocity.x -= (p.moveSpeed * 0.08);
+                else p.velocity.x -= p.moveSpeed;
+            }
             p.dir = -1;
         }
         if (GetInput(Controls.Player1.rightAxis1)) {
-            if (p.look >= 0) p.velocity.x += p.moveSpeed;
+            if (p.look >= 0) {
+                if (isSlipping) p.velocity.x += (p.moveSpeed * 0.08);
+                else p.velocity.x += p.moveSpeed;
+            }
             p.dir = 1;
         }
 
@@ -290,14 +316,10 @@ function ControlLoopPlatformer(p) {
     Buttons.zero.onPress = () => { NumberPickTile(10) };
     //#endregion
 
-    // Update position
-    UpdatePositionX(p);
-    DoGravity(p);
-    //WorldWrapX(p);
-    UpdatePickups(p);
-    
     // Apply friction
-    p.velocity.x *= friction;
+    if (isSlipping) p.velocity.x *= slipFriction;
+    else p.velocity.x *= friction;
+    isSlipping = false;
 
     // Apply terminal velocity
     if (p.velocity.y > terminalVel) p.velocity.y = terminalVel;
@@ -461,15 +483,25 @@ function PlaceFreeCustom(p, xNew, yNew, list) {
     return true;
 }
 
+// Block functions
 function CheckAllTileTypes(p, t, fallback) {
 
     if (deadlyTiles.includes(t.tileIndex)) {
         // Kill player
         DeadlyTileAction(p);
+        // Also bounce
+        fallback();
     }
     else if (bouncyTiles.includes(t.tileIndex)) {
         // Bounce player
-        BouncyTileAction(p);
+        BouncyTileAction(p, fallback);
+    }
+    else if (slipperyTiles.includes(t.tileIndex)) {
+        // Set slipping
+        SlipperyTileAction(p);
+        // Also bounce
+        fallback();
+
     }
     else {
         // Normal bounce
@@ -479,14 +511,25 @@ function CheckAllTileTypes(p, t, fallback) {
 
 function DeadlyTileAction(p) {
     // Kill player
-    if (!p.stomped) StompPlayer(p);
+    if (!p.stomped) {
+        // Stomp self for effects
+        GetStomped(p);
+        // Send server request for life reduction
+        StompPlayer(p);
+    }
 }
 
-function BouncyTileAction(p) {
-    // Bounce player
-    if (p.velocity.y > 0) {
-        if (p.velocity.y > 1) TriggerNetworkSound('land');
-        p.usedJumps = 0;
-    }
-    p.velocity.y *= -bounce*4;
+function BouncyTileAction(p, BounceFunc) {
+    // Change Bounce modifier for this frame
+    bounce *= 4.5;
+
+    // Bounce like normal
+    BounceFunc();
+
+    // Change back
+    bounce /= 4.5;
+}
+
+function SlipperyTileAction(p) {
+    isSlipping = true;
 }

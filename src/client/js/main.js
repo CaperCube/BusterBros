@@ -37,6 +37,8 @@ let myID = 0;
 let gravity = 0.08;//0.1;
 let terminalVel = 15;
 let friction = 0.8;
+const slipFriction = 0.99;
+let isSlipping = false;
 let bounce = 0.2;
 
 let drawHp = true;
