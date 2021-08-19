@@ -240,7 +240,7 @@ io.sockets.on('connection', function(socket) {
     socket.on(`clientUnStompPlayer`, function(data){
         // Tell all players that a has been stomped
         let p = serverGame.netPlayers[data.playerID];
-        if (p.lives > 0) {
+        if (p && p.lives > 0) {
             for (var sID in SOCKET_LIST) {
                 SOCKET_LIST[sID].emit('serverUnStompPlayer', {
                     playerID: data.playerID
