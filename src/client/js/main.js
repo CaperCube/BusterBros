@@ -102,27 +102,6 @@ function CameraControl(c) {
     if (Buttons.o.pressed) c.position = {x: 0, y: 0};
 }
 
-function SaveLevel() {
-    //let k = 0;
-    let saveArray = [];
-    let worldWidth = Math.round(worldBounds.x / gridCellSize);
-    let worldHeight = Math.round(worldBounds.y / gridCellSize);
-
-    for (let i = 0; i < worldHeight; i++) {
-        saveArray[i] = [];
-        for (let j = 0; j < worldWidth; j++) {
-            // Check if there's a block in this spot
-            let thisTile = BlockHere({ size: {w: gridCellSize, h: gridCellSize} }, j*gridCellSize, i*gridCellSize);
-            if (thisTile) saveArray[i][j] = thisTile.tileIndex; // null if no block here
-            else saveArray[i][j] = null;
-        }
-    }
-
-    console.log(saveArray);
-
-    socket.emit(`clientSaveLevel`, saveArray);
-}
-
 ////////////////////////////////////////////////////////
 // Init
 ////////////////////////////////////////////////////////

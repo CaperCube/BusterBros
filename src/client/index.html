@@ -49,7 +49,7 @@
         <button onclick="JoinWithName($('#DOM_uName'))">Join</button>
     </span><br>
     If your name is still "Player" after joining, that means there is no lobby open yet. Click "Host Game" to start one.<br>
-    <button onclick="HideShowDOM($('#DOM_controls'))">Control Settings</button> <button onclick="SaveLevel()">Save Level on Server</button><br>
+    <button onclick="HideShowDOM($('#DOM_controls'))">Control Settings</button> <button onclick="SaveLevel()">Save Level on Server</button> <button onclick="LoadServerLevel()">Load Last Saved Level</button><br>
     <span id="DOM_controls" style="display: none;">
         <button onclick="ApplyControlPreset(arrowPreset)">Classic Preset</button> <button onclick="ApplyControlPreset(WASDPreset)">WASD Preset</button><br>
         <button onclick="PressKeyPrompt($('#DOM_up_key'))" onkeydown="ChangeButton(this, Controls.Player1.upAxis1, $('#DOM_up_key'))">Aim Up</button> : <span id="DOM_up_key">up</span><br>

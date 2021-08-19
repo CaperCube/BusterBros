@@ -211,3 +211,14 @@ function Utils() {
         }
     };
 }
+
+module.exports.TileWall = TileWall;
+function TileWall(ix, iy, ti){
+    this.position = {
+        x: ix || 0,
+        y: iy || 0
+    };
+    
+    this.tileIndex = ti || 0;
+    this.ownerId = 0;
+}

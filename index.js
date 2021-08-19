@@ -20,7 +20,7 @@ var fs = require('fs');
 // Constants
 ////////////////////////////////////////
 const fExt = `.json`;
-const levelPath = `./levels/`;
+const levelPath = `levels/`;
 
 ////////////////////////////////////////
 // Server setup
@@ -88,7 +88,7 @@ io.sockets.on('connection', function(socket) {
             if (serverGame.netPlayers[p].lives <= 0) lostPlayers++;
             else wonPlayer = serverGame.netPlayers[p];
         }
-        if (lostPlayers === playerCount-1) {
+        if (playerCount > 1 && lostPlayers === playerCount-1) {
             // Tell all players that someone has won
             for (var sID in SOCKET_LIST) {
                 SOCKET_LIST[sID].emit('serverPlayerWon', wonPlayer.socketID);
@@ -192,8 +192,31 @@ io.sockets.on('connection', function(socket) {
 
     socket.on(`clientSaveLevel`, function(data) {
         // Save the level in the server's level directory
-        let fName = (`level_${Math.random().toString()}`).replace(/\./g,'');
+        //let fName = (`level_${Math.random().toString()}`).replace(/\./g,'');
+        let fName = (`level_temp`);
         ExportFile(JSON.stringify(data), fName+fExt, levelPath);
+    });
+
+    socket.on(`clientLoadLevel`, function(data) {
+        if (serverGame) {
+            // Load the temp saved level if it exists
+            let levelF = `${levelPath}level_temp${fExt}`;
+            // Read from file
+            let loadedLevel = LoadFile(levelF, function(data) {
+                // Convert index array into tile array
+                serverGame.level = ParseLevel(data);
+
+                // Send to all players the server level
+                for (var sID in SOCKET_LIST) {
+                    // Reset lives
+                    serverGame.netPlayers[sID].lives = 10;
+                    // Set level to hosts
+                    SOCKET_LIST[sID].emit('loadServersLevel', serverGame.level);
+                    // Tell players to reset game
+                    SOCKET_LIST[sID].emit('resetGame');
+                }
+            });
+        }
     });
 
     // Player death
@@ -285,7 +308,7 @@ function ExportFile(saveData, fName, dir) {
             fs.mkdirSync(fileDir);
         }
         // Write file to directory
-        fs.writeFile(`${fileDir}/${fName}`, saveData, function(err, data){
+        fs.writeFile(`${fileDir}${fName}`, saveData, function(err, data){
             if (err) {
                 return console.log(err);
             }
@@ -299,6 +322,47 @@ function ExportFile(saveData, fName, dir) {
             }
         });
     }
+}
+
+// Imports the given file as a string array
+function LoadFile(fName, callback) {
+    // Read entire file and split it up
+    if (fs.existsSync(fName)){
+        fs.readFile(fName, function(err, data) {
+            if(err) throw err;
+            // Convert data to js array
+            let loadedData = JSON.parse(data.toString());
+
+            console.log(`File ${fName} has finished loading.`);
+            //console.log(loadedData);
+
+            callback(loadedData);
+        });
+    }
+    else console.log(`${fName} does not exist.`);
+}
+
+function ParseLevel(l) {
+    let parsedLevel = [];
+    let gridCellSize = serverGame ? serverGame.gridCellSize : 16;
+
+    // Loop through 2D array and create tiles from it
+    for (var i = 0; i < l.length; i++) {
+        for (var j = 0; j < l[i].length; j++) {
+            if (l[i][j] != null) {
+                parsedLevel.push(new nGame.TileWall(
+                    gridCellSize * j,
+                    gridCellSize * i,
+                    l[i][j]
+                ));
+            }
+            else parsedLevel.push(null);
+        }
+    }
+
+    console.log(`Level has been parsed.`);
+
+    return parsedLevel;
 }
 
 console.log("Server has started");
