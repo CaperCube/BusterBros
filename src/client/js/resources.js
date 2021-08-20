@@ -94,6 +94,8 @@ const deadlyTiles = [
 
 const bouncyTiles = [
     92,
+    152,
+    287,
     378,
     379
 ];
@@ -104,6 +106,51 @@ const slipperyTiles = [
 
 const breakableTiles = [
     155
+];
+
+const oneSidedTiles = [
+    74,
+    75,
+    76,
+    273,
+    274,
+    275,
+    369,
+    370,
+    371,
+    465,
+    466,
+    467,
+    583,
+    584,
+    585,
+    984,
+    985,
+    986,
+    1016,
+    1017,
+    1018,
+    1019,
+    1020,
+    1021
+];
+
+const toggleOnTile = 149;
+
+const toggleOffTile = 150;
+
+const onTiles = [
+    88,
+    89,
+    90,
+    91
+];
+
+const offTiles = [
+    81,
+    82,
+    83,
+    84
 ];
 
 // Sounds

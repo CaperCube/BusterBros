@@ -6,11 +6,16 @@ function UpdatePositionX(p) {
         p.velocity.x *= -bounce;
     }
 
+    function KeepMoving() {
+        p.position.x += p.velocity.x;
+    }
+
     // Check x
     if (PlaceFree(p, p.position.x + p.velocity.x, p.position.y)) {
         // Wrap
         if ((p.position.x + (p.size.w/2) + p.velocity.x) < 0) {
-            if (PlaceFree(p, worldBounds.x - (gridCellSize/2), p.position.y)) {
+            let testPos = {x: worldBounds.x - (gridCellSize/2), y: p.position.y};
+            if (PlaceFree(p, testPos.x, testPos.y)) {
                 //wrap to Right
                 p.position = {x: worldBounds.x - (p.size.h/2), y: p.position.y};
             }
@@ -18,11 +23,14 @@ function UpdatePositionX(p) {
                 // Bounce
                 //Bounce();
                 let thisTile = BlockHere(p, worldBounds.x - (gridCellSize/2), p.position.y);
-                if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
+                if (thisTile) CheckAllTileTypes(p, thisTile, Bounce, function() {
+                    p.position = {x: worldBounds.x - (p.size.h/2), y: p.position.y};
+                }, false);
             }
         }
         else if ((p.position.x + (p.size.w/2) + p.velocity.x) >= worldBounds.x) {
-            if (PlaceFree(p, 0, p.position.y)) {
+            let testPos = {x: 0, y: p.position.y};
+            if (PlaceFree(p, testPos.y, testPos.y)) {
                 //wrap to Left
                 p.position = {x: (p.size.h/-2), y: p.position.y};
             }
@@ -30,16 +38,17 @@ function UpdatePositionX(p) {
                 // Bounce
                 //Bounce();
                 let thisTile = BlockHere(p, 0, p.position.y);
-                if (thisTile)CheckAllTileTypes(p, thisTile, Bounce);
+                if (thisTile) CheckAllTileTypes(p, thisTile, Bounce, KeepMoving, false);
             }
         }
         // Do movement
-        else p.position.x += p.velocity.x;
+        else KeepMoving();
     }
     else {
         // Collide with tile on the left or right
-        let thisTile = BlockHere(p, p.position.x + p.velocity.x, p.position.y);
-        if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
+        let testPos = {x: p.position.x + p.velocity.x, y: p.position.y};
+        let thisTile = BlockHere(p, testPos.x, testPos.y);
+        if (thisTile) CheckAllTileTypes(p, thisTile, Bounce, KeepMoving, false);
     }
 }
 
@@ -78,38 +87,49 @@ function DoGravity(p) {
         p.velocity.y *= -bounce;
     }
 
-    // Check y
-    if (PlaceFree(p, p.position.x, p.position.y + p.velocity.y)) {
+    function KeepMoving() {
         p.position.y += p.velocity.y;
+    }
+
+    // Check y
+    let testPos = {x: p.position.x, y: p.position.y + p.velocity.y};
+    if (PlaceFree(p, testPos.x, testPos.y)) {
+        // Allow Y movement
+        KeepMoving();
     }
     else {
         // Collide with tile on the bottom or top
-        let thisTile = BlockHere(p, p.position.x, p.position.y + p.velocity.y);
-        if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
+        let thisTile = BlockHere(p, testPos.x, testPos.y);
+        if (thisTile) CheckAllTileTypes(p, thisTile, Bounce, KeepMoving, true);
     }
     // world bounds
     if ((p.position.y + (p.size.h/2) + p.velocity.y) < 0) {
-        if (PlaceFree(p, p.position.x,  worldBounds.y - (gridCellSize/2))) {
+        let testPos = {x: p.position.x, y: worldBounds.y - (gridCellSize/2)};
+        if (PlaceFree(p, testPos.x, testPos.y)) {
             //wrap to bottom
             p.position = {x: p.position.x, y: worldBounds.y - (p.size.h/2) - 2};
         }
         else {
             // Bounce
             //Bounce();
-            let thisTile = BlockHere(p, p.position.x,  worldBounds.y - (gridCellSize/2));
-            if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
+            let thisTile = BlockHere(p, testPos.x, testPos.y);
+            if (thisTile) CheckAllTileTypes(p, thisTile, Bounce, function() {
+                //wrap to bottom
+                p.position = {x: p.position.x, y: worldBounds.y - (p.size.h/2) - 2};
+            }, true);
         }
     }
     else if ((p.position.y + (p.size.h/2) + p.velocity.y) >= worldBounds.y) {
-        if (PlaceFree(p, p.position.x, 0)) {
+        let testPos = {x: p.position.x, y: 0};
+        if (PlaceFree(p, testPos.x, testPos.y)) {
             //wrap to top
             p.position = {x: p.position.x, y: (p.size.h/-2) + 2};
         }
         else {
             // Bounce
             //Bounce();
-            let thisTile = BlockHere(p, p.position.x, 0);
-            if (thisTile) CheckAllTileTypes(p, thisTile, Bounce);
+            let thisTile = BlockHere(p, testPos.x, testPos.y);
+            if (thisTile) CheckAllTileTypes(p, thisTile, Bounce, KeepMoving, true);
         }
     }
     // Do accelleration
@@ -274,6 +294,12 @@ function ControlLoopPlatformer(p) {
                 // Turn off parry after a short amount of time
                 setTimeout(() => { p.parry = false; }, 70);
             }
+            // Drop through if above a one-sided tile
+            let tileImOn = BlockHere(p, p.position.x, p.position.y + 1);
+            if ( tileImOn && oneSidedTiles.includes(tileImOn.tileIndex) ) {
+                // Drop
+                p.position.y += 2;
+            }
         }
         // Look up
         else if (GetInput(Controls.Player1.upAxis1)) {
@@ -326,6 +352,9 @@ function ControlLoopPlatformer(p) {
     else if (p.velocity.y < -terminalVel) p.velocity.y = -terminalVel;
     
     //ControllCam();
+
+    //ctx.fillRect(p.position.x, p.position.y, 2, 2);
+    //ctx.fillRect(p.position.x, p.position.y + p.size.h, 2, 2);
 }
 
 function GetStomped(p) {
@@ -484,7 +513,7 @@ function PlaceFreeCustom(p, xNew, yNew, list) {
 }
 
 // Block functions
-function CheckAllTileTypes(p, t, fallback) {
+function CheckAllTileTypes(p, t, fallback, allowMotion, yMotion) {
 
     if (deadlyTiles.includes(t.tileIndex)) {
         // Kill player
@@ -502,6 +531,33 @@ function CheckAllTileTypes(p, t, fallback) {
         // Also bounce
         fallback();
 
+    }
+    else if (oneSidedTiles.includes(t.tileIndex)) {
+        // If the player is above and is moving down
+        let isFalling = p.velocity.y > 0;
+        let feetAboveTile = (p.position.y + p.size.h <= t.position.y);
+        let tileInBounds = t.position.y >= 0;
+        let tileAtTop = t.position.y === 0;
+        let feetPastYBounds = p.position.y + p.size.h >= worldBounds.y;
+
+        if ( yMotion && isFalling && ((feetAboveTile && tileInBounds) || (feetPastYBounds && tileAtTop)) ) {
+            // Bounce player
+            fallback();
+        }
+        else {
+            // Let the player keep moving
+            allowMotion();
+        }
+    }
+    else if (offTiles.includes(t.tileIndex)) {
+        // Pass through
+        allowMotion();
+    }
+    else if (toggleOnTile === t.tileIndex || toggleOffTile === t.tileIndex) {
+        // Toggle all toggleable blocks
+        if (p.velocity.y < 0 && p.position.y + (p.size.h/2) > t.position.y) ToggleBlocksAction();
+        // Normal bounce
+        fallback();
     }
     else {
         // Normal bounce
@@ -532,4 +588,27 @@ function BouncyTileAction(p, BounceFunc) {
 
 function SlipperyTileAction(p) {
     isSlipping = true;
+}
+
+function ToggleBlocksAction() {
+    for (var i = 0; i < Walls.length; i++) {
+        if (Walls[i]) {
+            let newTile = null;
+            if (onTiles.includes(Walls[i].tileIndex)) {
+                //newTile = new TileWall(Walls[i].position.x, Walls[i].position.y, offTiles[onTiles.indexOf(Walls[i].tileIndex)], Walls[i].ownerId);
+                //Walls[i] = newTile;
+                Walls[i].tileIndex = offTiles[onTiles.indexOf(Walls[i].tileIndex)];
+            }
+            else if (offTiles.includes(Walls[i].tileIndex)) {
+                //newTile = new TileWall(Walls[i].position.x, Walls[i].position.y, onTiles[offTiles.indexOf(Walls[i].tileIndex)], Walls[i].ownerId);
+                //Walls[i] = newTile;
+                Walls[i].tileIndex = onTiles[offTiles.indexOf(Walls[i].tileIndex)];
+            }
+
+            //Walls.push(newTile);
+            //SendRemovedTile(Walls[i]);
+            //SendNewTile(newTile);
+            UpdateTile(Walls[i]);
+        }
+    }
 }

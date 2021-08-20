@@ -190,6 +190,24 @@ io.sockets.on('connection', function(socket) {
         }
     });
 
+    socket.on(`clientUpdateTile`, function(data) {
+        if (serverGame && serverGame.serverTickRef) {
+            // Update tile in server level
+            if (serverGame.level) {
+
+                let tileIndex = serverGame.level.indexOf(netUtils.GetTileByPosition(serverGame, data.position));
+                if (tileIndex) {
+                    //serverGame.level[tileIndex] = null;
+                    serverGame.level[tileIndex].tileIndex = data.tileIndex;
+                }
+            }
+            // Tell other players that a tile has been placed
+            for (var sID in SOCKET_LIST) {
+                if (sID != socket.ID) SOCKET_LIST[sID].emit('serverUpdateTile', data);
+            }
+        }
+    });
+
     socket.on(`clientSaveLevel`, function(data) {
         // Save the level in the server's level directory
         //let fName = (`level_${Math.random().toString()}`).replace(/\./g,'');

@@ -142,6 +142,10 @@ function SendNewTile(newTile) {
     socket.emit(`clientAddTile`, newTile);
 }
 
+function UpdateTile(newTile) {
+    socket.emit(`clientUpdateTile`, newTile);
+}
+
 function SendRemovedTile(newTile) {
     socket.emit(`clientRemoveTile`, newTile);
 }
@@ -161,6 +165,14 @@ socket.on(`serverRemoveTile`, function(data){
     let tileIndex = Walls.indexOf(tileHere);
     Walls.splice(tileIndex, 1);
     REMOVE_SFX.Play();
+});
+
+socket.on(`serverUpdateTile`, function(data){
+    let tileHere = BlockHere({size: Players[myID].size}, data.position.x, data.position.y);
+    let tileIndex = Walls.indexOf(tileHere);
+    //Walls.splice(tileIndex, 1);
+    Walls[tileIndex].tileIndex = data.tileIndex;
+    //REMOVE_SFX.Play();
 });
 
 // Attack player
