@@ -12,15 +12,17 @@ const SOUND_PATH = "src/sound/";
 // Images
 const imageSRC = [
     `${SRC_PATH}busterbros_tiles.png`,
+    `${SRC_PATH}Stomp_fx.png`,
     `${SRC_PATH}Char_Blue.png`,
     `${SRC_PATH}Char_Red.png`,
-    `${SRC_PATH}Stomp_fx.png`
+    `${SRC_PATH}Cube_Char.png`
 ];
 
 const MAIN_SHEET = 0;
-const PLAYER_SPRITE = 1;
-const PLAYER_OTHER_SPRITE = 2;
-const STOMP_SHEET = 3;
+const STOMP_SHEET = 1;
+const PLAYER_SPRITE = 2;
+const PLAYER_OTHER_SPRITE = 3;
+const PLAYER_CUBE_SPRITE = 4;
 
 const uiTiles = {
     tl: 923,
