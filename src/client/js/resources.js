@@ -15,7 +15,8 @@ const imageSRC = [
     `${SRC_PATH}Stomp_fx.png`,
     `${SRC_PATH}Char_Blue.png`,
     `${SRC_PATH}Char_Red.png`,
-    `${SRC_PATH}Cube_Char.png`
+    `${SRC_PATH}Cube_Char.png`,
+    `${SRC_PATH}Groveling_Char.png`
 ];
 
 const MAIN_SHEET = 0;
@@ -23,6 +24,7 @@ const STOMP_SHEET = 1;
 const PLAYER_SPRITE = 2;
 const PLAYER_OTHER_SPRITE = 3;
 const PLAYER_CUBE_SPRITE = 4;
+const PLAYER_GROVELING_SPRITE = 5;
 
 const uiTiles = {
     tl: 923,
