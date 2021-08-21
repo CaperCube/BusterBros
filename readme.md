@@ -61,30 +61,31 @@ Here's some beginner / intermediate level instructions to get this bot up and ru
 ## Roadmap:
 This is a loose set of features I think would support the goals listed above.
 
-- Clean-up tile storage (probably use a 2D array)
-- Collab Level Editor mode (rather than having a seperate editor)
-	- Edit / create levels with friends
-	- Anyone can switch themselves between tesing and editing at any time
-- Item pickups
-	- Block pickups (assuming the player can't always place blocks)
-	- Double jump
-	- Speed up
-	- Killer parry
-	- Extra life
-	- Throwable something
-- Special tiles
-	- Item blocks: Bump to get item
-	- Telleporter / Doorways: Enter one, come out the other
-	- Water: Low gravity & infinite jumps
-- Moving tiles / platforms
-- Animated tiles
-- UI for loading saved levels
-- Custom player sprite sheets
-- Game modes:
-    - Last one standing: Last one alive wins
-    - Kill count: First to a set number of kills wins
-    - Team battle: First team to set number of kills wins
-	- Hoard mode: Fight waves of NPCs with your friends
+- [ ] Local multiplayer
+- [ ] Clean-up tile storage (probably use a 2D array)
+- [ ] Collab Level Editor mode (rather than having a seperate editor)
+	- [ ] Edit / create levels with friends
+	- [ ]Anyone can switch themselves between tesing and editing at any time
+- [ ] Item pickups
+	- [ ] Block pickups (assuming the player can't always place blocks)
+	- [ ] Double jump
+	- [ ] Speed up
+	- [ ] Killer parry
+	- [ ] Extra life
+	- [ ] Throwable something
+- [ ] Special tiles
+	- [ ] Item blocks: Bump to get item
+	- [ ] Telleporter / Doorways: Enter one, come out the other
+	- [ ] Water: Low gravity & infinite jumps
+- [ ] Moving tiles / platforms
+- [ ] Animated tiles
+- [ ] UI for loading saved levels
+- [ ] Custom player sprite sheets
+- [ ] Game modes:
+    - [ ] Last one standing: Last one alive wins
+    - [ ] Kill count: First to a set number of kills wins
+    - [ ] Team battle: First team to set number of kills wins
+	- [ ] Hoard mode: Fight waves of NPCs with your friends
 
 -----------------------------------------------------------
 ## Have fun!
