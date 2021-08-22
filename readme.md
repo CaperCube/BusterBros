@@ -12,12 +12,12 @@ Use these to help guide the features of this project.
 
 * Simple code: Try to keep things neat and easy to read. As a stretch goal for myself I've been trying to keep my library dependencies to a minimum; this isn't strictly necessary, but I think it's a fun challenge.
 * Quick to play: Players should be able to hop in and out on a whim. Think low time commitment (<= 5min)
-* Collaborative: If you want to make a level (or possibly other things too) you should be able to do this live with friends just as easily as playing the game.
+* Collaborative editors: If you want to make a level (or possibly other things too) you should be able to do this live with friends just as easily as playing the game.
 * Fun over all: I believe that games are more fun if you let them be fun. If something is unbalanced, broken, but fun, don't remove it; just allow it to be disabled / enabled or adjusted. I'd like to err on the side of creating a customizable experience rather than a specific one.
 
 -----------------------------------------------------------
 ## Contribution:
-I'm open to colaborating on this project for the most part, I mostly would like to stick pretty close to the project goals (at least on the main branch), but I can also be flexible.
+I'm open to colaborating on this project for the most part. I mostly would like to stick pretty close to the project goals (at least on the main branch), but I can also be flexible.
 
 -----------------------------------------------------------
 ## Hosting a server:
