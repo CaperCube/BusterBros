@@ -65,7 +65,7 @@ This is a loose set of features I think would support the goals listed above.
 - [ ] Clean-up tile storage (probably use a 2D array)
 - [ ] Collab Level Editor mode (rather than having a seperate editor)
 	- [ ] Edit / create levels with friends
-	- [ ]Anyone can switch themselves between tesing and editing at any time
+	- [ ] Anyone can switch themselves between tesing and editing at any time
 - [ ] Item pickups
 	- [ ] Block pickups (assuming the player can't always place blocks)
 	- [ ] Double jump
