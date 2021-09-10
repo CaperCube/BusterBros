@@ -177,7 +177,7 @@ io.sockets.on('connection', function(socket) {
 
                 //serverGame.level.splice(tileIndex, 1);
                 //console.log(serverGame.level);
-                if (level[tileIndex]) {
+                if (serverGame.level[tileIndex]) {
                     //console.log(`Tile removed at x: ${data.position.x}, y: ${data.position.y}`);
                     serverGame.level[tileIndex] = null;
                 }
@@ -196,7 +196,7 @@ io.sockets.on('connection', function(socket) {
             if (serverGame.level) {
 
                 let tileIndex = serverGame.level.indexOf(netUtils.GetTileByPosition(serverGame, data.position));
-                if (level[tileIndex]) {
+                if (serverGame.level[tileIndex]) {
                     //serverGame.level[tileIndex] = null;
                     serverGame.level[tileIndex].tileIndex = data.tileIndex;
                 }
