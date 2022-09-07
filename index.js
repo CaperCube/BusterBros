@@ -383,4 +383,7 @@ function ParseLevel(l) {
     return parsedLevel;
 }
 
-console.log("Server has started");
+console.log(
+    "Server has started",
+    `Game: http://localhost:${port}/index.html`
+)
