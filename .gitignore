@@ -7,6 +7,9 @@ node_modules/
 # dotenv environment variables file
 .env
 
+# bianaries
+index-win.exe
+
 # clutter
 reference/
 dump/

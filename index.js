@@ -15,7 +15,6 @@ const app = express();
 const serv = require('http').Server(app);
 const io = require('socket.io')(serv,{});
 var fs = require('fs');
-
 ////////////////////////////////////////
 // Constants
 ////////////////////////////////////////
@@ -26,7 +25,7 @@ const levelPath = `levels/`;
 // Server setup
 ////////////////////////////////////////
 // the __dirname is the current directory from where the script is running
-app.use(express.static(__dirname + '/src/client'));
+app.use(express.static(process.cwd() + '/src/client'));
 
 // listen for requests
 serv.listen(port);
