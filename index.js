@@ -131,7 +131,7 @@ io.sockets.on('connection', function(socket) {
         serverGame.StartGame(SOCKET_LIST);
     });
 
-    socket.on('clientMove', function(data){
+    socket.on('clientMove', function(data) {
         // Get player with this socket.ID (if they exist)
         if (serverGame != null) {
 
@@ -147,7 +147,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     // Level listeners
-    socket.on('clientAddTile', function(data){
+    socket.on('clientAddTile', function(data) {
         // Is the game running?
         //if (serverGame != null) {
         if (serverGame && serverGame.serverTickRef) {
@@ -161,7 +161,7 @@ io.sockets.on('connection', function(socket) {
         }
     });
 
-    socket.on('clientRemoveTile', function(data){
+    socket.on('clientRemoveTile', function(data) {
         // Is the game running?
         //if (serverGame != null) {
         if (serverGame && serverGame.serverTickRef) {
@@ -238,7 +238,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     // Player death
-    socket.on('clientStompPlayer', function(data){
+    socket.on('clientStompPlayer', function(data) {
         // Get player with this socket.ID (if they exist)
         if (serverGame != null) {
 
@@ -278,7 +278,7 @@ io.sockets.on('connection', function(socket) {
         }
     });
 
-    socket.on(`clientUnStompPlayer`, function(data){
+    socket.on(`clientUnStompPlayer`, function(data) {
         // Tell all players that a has been stomped
         let p = serverGame.netPlayers[data.playerID];
         if (p && p.lives > 0) {
@@ -291,7 +291,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     // Sound triggers
-    socket.on(`clientTriggerSound`, function(data){
+    socket.on(`clientTriggerSound`, function(data) {
         // Tell all clients to play the sound
         for (var sID in SOCKET_LIST) {
             SOCKET_LIST[sID].emit('serverTriggerSound', data);
@@ -299,7 +299,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     // Create listener for this user disconnecting
-    socket.on('disconnect', function(){
+    socket.on('disconnect', function() {
         // Remove player (if applicable)
         //SOCKET_LIST.splice(socket.ID, 1);
         // Tell others that I left
